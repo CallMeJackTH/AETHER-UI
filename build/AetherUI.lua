@@ -178,6 +178,7 @@ function Aether:CreateWindow(config)
     selfWindow.ThemeObjects={}
     selfWindow.Janitor=Janitor.new()
     selfWindow.Tabs={}
+    selfWindow.NavGroups={}
     selfWindow.Values={}
     selfWindow.Configurations={}
     selfWindow.CurrentConfig=nil
@@ -295,12 +296,14 @@ function Aether:CreateWindow(config)
         local layout=make("UIListLayout",{Padding=UDim.new(0,6),SortOrder=Enum.SortOrder.LayoutOrder},page); make("UIPadding",{PaddingTop=UDim.new(0,12),PaddingBottom=UDim.new(0,12),PaddingLeft=UDim.new(0,14),PaddingRight=UDim.new(0,14)},page); setCanvas(page,layout)
         local tabName=tabConfig.Name or "Tab"
         local group=({Dashboard="MAIN",Combat="FEATURES",Visuals="FEATURES",Components="FEATURES",Showcase="FEATURES",Configs="SYSTEM",Settings="SYSTEM",Notifications="SYSTEM",Modals="SYSTEM"})[tabName]
-        if group and (not selfWindow.LastNavGroup or selfWindow.LastNavGroup~=group) then
-            local sectionLabel=text(nav,group,10,Color3.fromRGB(92,103,121),true); sectionLabel.Name="NavGroup_"..group; sectionLabel.Size=UDim2.new(1,0,0,20); sectionLabel.TextXAlignment=Enum.TextXAlignment.Left; sectionLabel.LayoutOrder=#selfWindow.Tabs*2
-            selfWindow.LastNavGroup=group
+        local groupOrder={MAIN=0,FEATURES=10,SYSTEM=20}
+        local tabOrder={Dashboard=1,Combat=11,Visuals=12,Components=13,Showcase=13,Configs=21,Settings=22,Notifications=23,Modals=24}
+        if group and not selfWindow.NavGroups[group] then
+            local sectionLabel=text(nav,group,10,Color3.fromRGB(92,103,121),true); sectionLabel.Name="NavGroup_"..group; sectionLabel.Size=UDim2.new(1,0,0,20); sectionLabel.TextXAlignment=Enum.TextXAlignment.Left; sectionLabel.LayoutOrder=groupOrder[group] or (#selfWindow.Tabs*2)
+            selfWindow.NavGroups[group]=true
         end
         local glyph=tabConfig.Icon or ({Dashboard="▦",Combat="◎",Visuals="◉",Components="✧",Showcase="✧",Configs="☷",Settings="⚙",Notifications="♧",Modals="▣"})[tabName] or "◇"
-        local navButton=button(nav,"   "..glyph.."    "..tabName,theme,30); navButton.Name="Nav_"..tabName; navButton.TextXAlignment=Enum.TextXAlignment.Left; navButton.TextTruncate=Enum.TextTruncate.AtEnd; navButton.TextSize=12; navButton.LayoutOrder=#selfWindow.Tabs*2+1
+        local navButton=button(nav,"   "..glyph.."    "..tabName,theme,30); navButton.Name="Nav_"..tabName; navButton.TextXAlignment=Enum.TextXAlignment.Left; navButton.TextTruncate=Enum.TextTruncate.AtEnd; navButton.TextSize=12; navButton.LayoutOrder=tabOrder[tabName] or (30+#selfWindow.Tabs*2)
         local activeMark=make("Frame",{Name="ActiveIndicator",BackgroundColor3=theme.Accent,BorderSizePixel=0,Position=UDim2.fromOffset(0,7),Size=UDim2.fromOffset(3,16),Visible=#selfWindow.Tabs==0},navButton); corner(activeMark,2)
         local tab={Name=tabName,Page=page,Nav=navButton,Indicator=activeMark,Glyph=glyph,Window=selfWindow}
         table.insert(selfWindow.Tabs,tab)
