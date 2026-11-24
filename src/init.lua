@@ -124,7 +124,7 @@ function Aether:CreateWindow(config)
     local search=button(titlebar,"⌕  Search...   ⌘K",theme,24); search.Size=UDim2.fromOffset(132,24); search.Position=UDim2.new(1,-190,0,7); search.TextSize=10; search.TextColor3=theme.Muted
     local min=button(titlebar,"—",theme,24); min.Size=UDim2.fromOffset(24,24); min.Position=UDim2.new(1,-52,0,7)
     local close=button(titlebar,"×",theme,24); close.Size=UDim2.fromOffset(24,24); close.Position=UDim2.new(1,-26,0,7); close.TextColor3=theme.Muted
-    min.MouseButton1Click:Connect(function() selfWindow.Minimized=not selfWindow.Minimized; tween(main,.2,{Size=selfWindow.Minimized and UDim2.new(main.Size.X.Scale,main.Size.X.Offset,0,40) or (config.Size or (UserInputService.TouchEnabled and UDim2.fromOffset(460,320) or UDim2.fromOffset(680,440)))}); selfWindow.Body.Visible=not selfWindow.Minimized end)
+    min.MouseButton1Click:Connect(function() selfWindow.Minimized=not selfWindow.Minimized; tween(main,.2,{Size=selfWindow.Minimized and UDim2.new(main.Size.X.Scale,main.Size.X.Offset,0,38) or (config.Size or (UserInputService.TouchEnabled and UDim2.fromOffset(460,320) or UDim2.fromOffset(680,440)))}); selfWindow.Body.Visible=not selfWindow.Minimized end)
     close.MouseButton1Click:Connect(function() selfWindow:Destroy() end)
     local dragging, dragStart, startPos=false,nil,nil
     selfWindow.Janitor:Add(titlebar.InputBegan:Connect(function(input)
@@ -147,6 +147,33 @@ function Aether:CreateWindow(config)
     local userName=text(footerCard,config.UserName or "KairoDev",11,theme.Text,true); userName.Position=UDim2.fromOffset(39,4); userName.Size=UDim2.new(1,-44,0,15)
     local userMeta=text(footerCard,"Lifetime  •  UID 0142",9,theme.Muted,false); userMeta.Position=UDim2.fromOffset(39,19); userMeta.Size=UDim2.new(1,-44,0,13)
     local content=make("Frame",{Name="Content",Position=UDim2.new(0,165,0,0),Size=UDim2.new(1,-165,1,0),BackgroundTransparency=1},body); selfWindow.Content=content
+    local scale=make("UIScale",{Scale=1},main)
+    local compact=false
+    local function applyResponsive()
+        local camera=workspace.CurrentCamera
+        local viewport=camera and camera.ViewportSize or Vector2.new(1280,720)
+        compact=UserInputService.TouchEnabled or viewport.X<768
+        local rail=compact and 46 or 165
+        sidebar.Size=UDim2.new(0,rail,1,0)
+        content.Position=UDim2.new(0,rail,0,0); content.Size=UDim2.new(1,-rail,1,0)
+        footerCard.Size=compact and UDim2.fromOffset(30,30) or UDim2.new(1,-16,0,38)
+        footerCard.Position=compact and UDim2.new(0,8,1,-38) or UDim2.new(0,8,1,-46)
+        avatar.Position=compact and UDim2.fromOffset(3,3) or UDim2.fromOffset(8,7)
+        userName.Visible=not compact; userMeta.Visible=not compact
+        scale.Scale=compact and math.min(1,viewport.X/490,viewport.Y/350) or 1
+        for _,t in ipairs(selfWindow.Tabs) do
+            if t.Nav then
+                t.Nav.Text=compact and (" "..t.Glyph) or ("   "..t.Glyph.."    "..t.Name)
+                t.Nav.TextXAlignment=compact and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
+                t.Nav.TextSize=compact and 14 or 12
+            end
+        end
+    end
+    applyResponsive()
+    if workspace.CurrentCamera then
+        selfWindow.Janitor:Add(workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(applyResponsive))
+    end
+    selfWindow.Janitor:Add(UserInputService:GetPropertyChangedSignal("TouchEnabled"):Connect(applyResponsive))
     local function selectTab(tab)
         for _,t in ipairs(selfWindow.Tabs) do
             t.Page.Visible=(t==tab)
@@ -168,8 +195,9 @@ function Aether:CreateWindow(config)
         local glyph=tabConfig.Icon or ({Dashboard="▦",Combat="◎",Visuals="◉",Components="✧",Showcase="✧",Configs="☷",Settings="⚙",Notifications="♧",Modals="▣"})[tabName] or "◇"
         local navButton=button(nav,"   "..glyph.."    "..tabName,theme,30); navButton.Name="Nav_"..tabName; navButton.TextXAlignment=Enum.TextXAlignment.Left; navButton.TextTruncate=Enum.TextTruncate.AtEnd; navButton.TextSize=12; navButton.LayoutOrder=#selfWindow.Tabs*2+1
         local activeMark=make("Frame",{Name="ActiveIndicator",BackgroundColor3=theme.Accent,BorderSizePixel=0,Position=UDim2.fromOffset(0,7),Size=UDim2.fromOffset(3,16),Visible=#selfWindow.Tabs==0},navButton); corner(activeMark,2)
-        local tab={Name=tabName,Page=page,Nav=navButton,Indicator=activeMark,Window=selfWindow}
+        local tab={Name=tabName,Page=page,Nav=navButton,Indicator=activeMark,Glyph=glyph,Window=selfWindow}
         table.insert(selfWindow.Tabs,tab)
+        applyResponsive()
         navButton.MouseButton1Click:Connect(function() selectTab(tab) end)
         function tab:CreateSection(name)
             local section={Tab=self,Name=name or "Section",Window=selfWindow,Parent=page}
