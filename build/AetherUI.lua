@@ -106,7 +106,7 @@ local function button(parent, label, theme, height)
 end
 local function card(parent, theme, height)
     local f=make("Frame",{BackgroundColor3=theme.Surface,BackgroundTransparency=.08,Size=UDim2.new(1,0,0,height or 58)},parent)
-    corner(f,8); stroke(f,theme.Border,.25)
+    corner(f,8); stroke(f,Color3.fromRGB(30,36,46),.18)
     return f
 end
 local function list(parent, padding)
@@ -185,11 +185,15 @@ function Aether:CreateWindow(config)
     if config.Acrylic~=false then
         local gradient=make("UIGradient",{Rotation=35,Color=ColorSequence.new({ColorSequenceKeypoint.new(0,theme.Surface),ColorSequenceKeypoint.new(1,theme.Background)}),Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,.18),NumberSequenceKeypoint.new(1,.02)})},main)
     end
-    local titlebar=make("Frame",{Size=UDim2.new(1,0,0,40),BackgroundColor3=theme.Surface,BackgroundTransparency=.1},main)
-    local brand=text(titlebar,"◆  "..(config.Title or "AETHER UI"),13,theme.Text,true); brand.Position=UDim2.fromOffset(14,0); brand.Size=UDim2.new(1,-140,1,0)
-    local subtitle=text(titlebar,(config.Subtitle or "Premium Interface Framework").."  •  v"..selfWindow.Version,9,theme.Muted,false); subtitle.Position=UDim2.new(0,14,0,20); subtitle.Size=UDim2.new(1,-150,0,15)
-    local min=button(titlebar,"—",theme,25); min.Size=UDim2.fromOffset(28,25); min.Position=UDim2.new(1,-68,0,7)
-    local close=button(titlebar,"×",theme,25); close.Size=UDim2.fromOffset(28,25); close.Position=UDim2.new(1,-34,0,7)
+    local titlebar=make("Frame",{Name="TitleBar",Size=UDim2.new(1,0,0,38),BackgroundColor3=Color3.fromRGB(14,17,22),BackgroundTransparency=.35,BorderSizePixel=0},main)
+    local titleLine=make("Frame",{BackgroundColor3=Color3.fromRGB(26,31,40),BorderSizePixel=0,Position=UDim2.new(0,0,1,-1),Size=UDim2.new(1,0,0,1)},titlebar)
+    local logo=make("Frame",{BackgroundColor3=Color3.fromRGB(25,37,61),Position=UDim2.fromOffset(14,9),Size=UDim2.fromOffset(20,20)},titlebar); corner(logo,6); stroke(logo,theme.Accent,.35)
+    local logoText=text(logo,"◇",13,theme.Accent,true); logoText.TextXAlignment=Enum.TextXAlignment.Center; logoText.Size=UDim2.fromScale(1,1)
+    local brand=text(titlebar,config.Title or "Aether Framework",13,theme.Text,true); brand.Position=UDim2.fromOffset(42,0); brand.Size=UDim2.new(0,180,1,0)
+    local version=make("TextLabel",{BackgroundColor3=Color3.fromRGB(22,27,35),BorderSizePixel=0,Position=UDim2.fromOffset(224,9),Size=UDim2.fromOffset(38,19),Text="v2.4",Font=Enum.Font.Code,TextSize=10,TextColor3=theme.Muted},titlebar); corner(version,4); stroke(version,theme.Border,.2)
+    local search=button(titlebar,"⌕  Search...   ⌘K",theme,24); search.Size=UDim2.fromOffset(132,24); search.Position=UDim2.new(1,-190,0,7); search.TextSize=10; search.TextColor3=theme.Muted
+    local min=button(titlebar,"—",theme,24); min.Size=UDim2.fromOffset(24,24); min.Position=UDim2.new(1,-52,0,7)
+    local close=button(titlebar,"×",theme,24); close.Size=UDim2.fromOffset(24,24); close.Position=UDim2.new(1,-26,0,7); close.TextColor3=theme.Muted
     min.MouseButton1Click:Connect(function() selfWindow.Minimized=not selfWindow.Minimized; tween(main,.2,{Size=selfWindow.Minimized and UDim2.new(main.Size.X.Scale,main.Size.X.Offset,0,40) or (config.Size or (UserInputService.TouchEnabled and UDim2.fromOffset(460,320) or UDim2.fromOffset(680,440)))}); selfWindow.Body.Visible=not selfWindow.Minimized end)
     close.MouseButton1Click:Connect(function() selfWindow:Destroy() end)
     local dragging, dragStart, startPos=false,nil,nil
@@ -202,22 +206,39 @@ function Aether:CreateWindow(config)
         end
     end))
     selfWindow.Janitor:Add(UserInputService.InputEnded:Connect(function(input) if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then dragging=false end end))
-    local body=make("Frame",{Name="Body",Position=UDim2.fromOffset(0,40),Size=UDim2.new(1,0,1,-40),BackgroundTransparency=1},main); selfWindow.Body=body
-    local sidebar=make("Frame",{Size=UDim2.new(0,142,1,0),BackgroundColor3=theme.Surface,BackgroundTransparency=.18},body); selfWindow.Sidebar=sidebar
-    local nav=make("ScrollingFrame",{BackgroundTransparency=1,BorderSizePixel=0,Size=UDim2.new(1,0,1,-32),CanvasSize=UDim2.new(),ScrollBarThickness=2},sidebar)
-    local navLayout=make("UIListLayout",{Padding=UDim.new(0,4),SortOrder=Enum.SortOrder.LayoutOrder},nav); make("UIPadding",{PaddingTop=UDim.new(0,9),PaddingLeft=UDim.new(0,8),PaddingRight=UDim.new(0,8)},nav); setCanvas(nav,navLayout)
-    local footer=text(sidebar,"●  READY  •  "..selfWindow.Version,9,theme.Muted,false); footer.Position=UDim2.new(0,9,1,-27); footer.Size=UDim2.new(1,-18,0,18)
-    local content=make("Frame",{Position=UDim2.new(0,142,0,0),Size=UDim2.new(1,-142,1,0),BackgroundTransparency=1},body); selfWindow.Content=content
+    local body=make("Frame",{Name="Body",Position=UDim2.fromOffset(0,38),Size=UDim2.new(1,0,1,-38),BackgroundTransparency=1},main); selfWindow.Body=body
+    local sidebar=make("Frame",{Name="Sidebar",Size=UDim2.new(0,165,1,0),BackgroundColor3=Color3.fromRGB(13,16,21),BackgroundTransparency=.25,BorderSizePixel=0},body); selfWindow.Sidebar=sidebar
+    local sideLine=make("Frame",{BackgroundColor3=Color3.fromRGB(26,31,40),BorderSizePixel=0,Position=UDim2.new(1,-1,0,0),Size=UDim2.new(0,1,1,0)},sidebar)
+    local nav=make("ScrollingFrame",{Name="Navigation",BackgroundTransparency=1,BorderSizePixel=0,Position=UDim2.fromOffset(0,0),Size=UDim2.new(1,0,1,-54),CanvasSize=UDim2.new(),ScrollBarThickness=2,ScrollBarImageColor3=theme.Accent},sidebar)
+    local navLayout=make("UIListLayout",{Padding=UDim.new(0,2),SortOrder=Enum.SortOrder.LayoutOrder},nav); make("UIPadding",{PaddingTop=UDim.new(0,9),PaddingLeft=UDim.new(0,8),PaddingRight=UDim.new(0,8),PaddingBottom=UDim.new(0,8)},nav); setCanvas(nav,navLayout)
+    local footerCard=make("Frame",{Name="UserStatus",Position=UDim2.new(0,8,1,-46),Size=UDim2.new(1,-16,0,38),BackgroundColor3=Color3.fromRGB(18,22,29),BorderSizePixel=0},sidebar); corner(footerCard,8); stroke(footerCard,Color3.fromRGB(29,35,46),0)
+    local avatar=make("Frame",{BackgroundColor3=Color3.fromRGB(48,60,81),Position=UDim2.fromOffset(8,7),Size=UDim2.fromOffset(24,24)},footerCard); corner(avatar,12)
+    local avatarText=text(avatar,"K",10,Color3.fromRGB(245,247,251),true); avatarText.TextXAlignment=Enum.TextXAlignment.Center; avatarText.Size=UDim2.fromScale(1,1)
+    local userName=text(footerCard,config.UserName or "KairoDev",11,theme.Text,true); userName.Position=UDim2.fromOffset(39,4); userName.Size=UDim2.new(1,-44,0,15)
+    local userMeta=text(footerCard,"Lifetime  •  UID 0142",9,theme.Muted,false); userMeta.Position=UDim2.fromOffset(39,19); userMeta.Size=UDim2.new(1,-44,0,13)
+    local content=make("Frame",{Name="Content",Position=UDim2.new(0,165,0,0),Size=UDim2.new(1,-165,1,0),BackgroundTransparency=1},body); selfWindow.Content=content
     local function selectTab(tab)
-        for _,t in ipairs(selfWindow.Tabs) do t.Page.Visible=(t==tab); tween(t.Nav,.12,{BackgroundColor3=t==tab and theme.Elevated or theme.Surface,TextColor3=t==tab and theme.Text or theme.Muted}) end
+        for _,t in ipairs(selfWindow.Tabs) do
+            t.Page.Visible=(t==tab)
+            tween(t.Nav,.12,{BackgroundColor3=t==tab and Color3.fromRGB(21,26,35) or Color3.fromRGB(13,16,21),TextColor3=t==tab and theme.Text or Color3.fromRGB(136,148,168)})
+            if t.Indicator then t.Indicator.Visible=(t==tab) end
+        end
         selfWindow.ActiveTab=tab
     end
     function selfWindow:CreateTab(tabConfig)
         tabConfig=tabConfig or {}
         local page=make("ScrollingFrame",{Name="Page_"..(tabConfig.Name or "Tab"),Visible=#selfWindow.Tabs==0,BackgroundTransparency=1,BorderSizePixel=0,Size=UDim2.fromScale(1,1),CanvasSize=UDim2.new(),ScrollBarThickness=3,ScrollBarImageColor3=theme.Accent},content)
-        local layout=make("UIListLayout",{Padding=UDim.new(0,8),SortOrder=Enum.SortOrder.LayoutOrder},page); make("UIPadding",{PaddingTop=UDim.new(0,12),PaddingBottom=UDim.new(0,12),PaddingLeft=UDim.new(0,12),PaddingRight=UDim.new(0,12)},page); setCanvas(page,layout)
-        local navButton=button(nav,(tabConfig.Icon and "◇  " or "")..(tabConfig.Name or "Tab"),theme,32); navButton.TextXAlignment=Enum.TextXAlignment.Left; navButton.TextTruncate=Enum.TextTruncate.AtEnd
-        local tab={Name=tabConfig.Name or "Tab",Page=page,Nav=navButton,Window=selfWindow}
+        local layout=make("UIListLayout",{Padding=UDim.new(0,6),SortOrder=Enum.SortOrder.LayoutOrder},page); make("UIPadding",{PaddingTop=UDim.new(0,12),PaddingBottom=UDim.new(0,12),PaddingLeft=UDim.new(0,14),PaddingRight=UDim.new(0,14)},page); setCanvas(page,layout)
+        local tabName=tabConfig.Name or "Tab"
+        local group=({Dashboard="MAIN",Combat="FEATURES",Visuals="FEATURES",Components="FEATURES",Showcase="FEATURES",Configs="SYSTEM",Settings="SYSTEM",Notifications="SYSTEM",Modals="SYSTEM"})[tabName]
+        if group and (not selfWindow.LastNavGroup or selfWindow.LastNavGroup~=group) then
+            local sectionLabel=text(nav,group,10,Color3.fromRGB(92,103,121),true); sectionLabel.Name="NavGroup_"..group; sectionLabel.Size=UDim2.new(1,0,0,20); sectionLabel.TextXAlignment=Enum.TextXAlignment.Left; sectionLabel.LayoutOrder=#selfWindow.Tabs*2
+            selfWindow.LastNavGroup=group
+        end
+        local glyph=tabConfig.Icon or ({Dashboard="▦",Combat="◎",Visuals="◉",Components="✧",Showcase="✧",Configs="☷",Settings="⚙",Notifications="♧",Modals="▣"})[tabName] or "◇"
+        local navButton=button(nav,"   "..glyph.."    "..tabName,theme,30); navButton.Name="Nav_"..tabName; navButton.TextXAlignment=Enum.TextXAlignment.Left; navButton.TextTruncate=Enum.TextTruncate.AtEnd; navButton.TextSize=12; navButton.LayoutOrder=#selfWindow.Tabs*2+1
+        local activeMark=make("Frame",{Name="ActiveIndicator",BackgroundColor3=theme.Accent,BorderSizePixel=0,Position=UDim2.fromOffset(0,7),Size=UDim2.fromOffset(3,16),Visible=#selfWindow.Tabs==0},navButton); corner(activeMark,2)
+        local tab={Name=tabName,Page=page,Nav=navButton,Indicator=activeMark,Window=selfWindow}
         table.insert(selfWindow.Tabs,tab)
         navButton.MouseButton1Click:Connect(function() selectTab(tab) end)
         function tab:CreateSection(name)
@@ -228,7 +249,7 @@ function Aether:CreateWindow(config)
             ll:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() container.Size=UDim2.new(1,0,0,ll.AbsoluteContentSize.Y) end)
             section.Container=container
             local function row(name,desc,height)
-                local f=card(container,theme,height or 54)
+                local f=card(container,theme,height or 54); f.BackgroundColor3=Color3.fromRGB(19,23,30); f.BackgroundTransparency=.15
                 local title=text(f,name or "Control",12,theme.Text,true); title.Position=UDim2.fromOffset(10,5); title.Size=UDim2.new(1,-20,0,19)
                 if desc and desc~="" then local d=text(f,desc,10,theme.Muted,false); d.Position=UDim2.fromOffset(10,25); d.Size=UDim2.new(1,-20,0,18) end
                 return f
