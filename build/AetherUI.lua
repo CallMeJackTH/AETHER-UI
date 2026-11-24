@@ -120,12 +120,17 @@ end
 
 function Aether:Notify(config)
     config=config or {}
-    local frame=make("Frame",{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-18,0,18),Size=UDim2.fromOffset(270,72),BackgroundColor3=self.Theme.Surface,BackgroundTransparency=.04,ZIndex=50},self.ToastLayer)
-    corner(frame,9); stroke(frame,self.Theme.Accent,.25)
-    local title=text(frame,config.Title or "AETHER UI",13,self.Theme.Text,true); title.Position=UDim2.fromOffset(12,8); title.Size=UDim2.new(1,-24,0,20); title.ZIndex=51
-    local body=text(frame,config.Content or config.Description or "Notification",11,self.Theme.Muted,false); body.Position=UDim2.fromOffset(12,31); body.Size=UDim2.new(1,-24,0,30); body.TextWrapped=true; body.ZIndex=51
-    frame.Position=UDim2.new(1,300,0,18); tween(frame,.25,{Position=UDim2.new(1,-18,0,18)})
-    task.delay(tonumber(config.Duration) or 3,function() if frame.Parent then tween(frame,.2,{Position=UDim2.new(1,300,0,18)}); task.delay(.22,function() if frame.Parent then frame:Destroy() end end) end end)
+    local frame=make("Frame",{Name="Toast",Size=UDim2.fromOffset(270,64),BackgroundColor3=Color3.fromRGB(14,17,23),BackgroundTransparency=.04,ZIndex=50,LayoutOrder=-math.floor(os.clock()*1000)},self.ToastLayer)
+    corner(frame,9); stroke(frame,Color3.fromRGB(34,41,54),.05)
+    local icon=make("Frame",{BackgroundColor3=Color3.fromRGB(25,37,61),Position=UDim2.fromOffset(10,10),Size=UDim2.fromOffset(24,24),ZIndex=51},frame); corner(icon,6); stroke(icon,self.Theme.Accent,.25)
+    local glyph=text(icon,"✓",13,self.Theme.Accent,true); glyph.TextXAlignment=Enum.TextXAlignment.Center; glyph.Size=UDim2.fromScale(1,1); glyph.ZIndex=52
+    local title=text(frame,config.Title or "AETHER UI",12,self.Theme.Text,true); title.Position=UDim2.fromOffset(44,8); title.Size=UDim2.new(1,-56,0,18); title.ZIndex=51
+    local body=text(frame,config.Content or config.Description or "Notification",10,self.Theme.Muted,false); body.Position=UDim2.fromOffset(44,27); body.Size=UDim2.new(1,-54,0,26); body.TextWrapped=true; body.ZIndex=51
+    local timer=make("Frame",{BackgroundColor3=self.Theme.Accent,BorderSizePixel=0,Position=UDim2.new(0,0,1,-2),Size=UDim2.new(1,0,0,2),ZIndex=52},frame)
+    local duration=tonumber(config.Duration) or 3
+    tween(frame,.2,{BackgroundTransparency=0})
+    tween(timer,duration,{Size=UDim2.new(0,0,0,2)})
+    task.delay(duration,function() if frame.Parent then tween(frame,.18,{BackgroundTransparency=1}); task.delay(.2,function() if frame.Parent then frame:Destroy() end end) end end)
     return frame
 end
 
@@ -179,6 +184,8 @@ function Aether:CreateWindow(config)
     local gui=make("ScreenGui",{Name="AETHER_UI",ResetOnSpawn=false,IgnoreGuiInset=true,ZIndexBehavior=Enum.ZIndexBehavior.Sibling},player:WaitForChild("PlayerGui"))
     selfWindow.Gui=gui; selfWindow.Janitor:Add(gui)
     local toast=make("Frame",{Name="ToastLayer",BackgroundTransparency=1,Size=UDim2.fromScale(1,1),ZIndex=50},gui); selfWindow.ToastLayer=toast
+    make("UIListLayout",{FillDirection=Enum.FillDirection.Vertical,HorizontalAlignment=Enum.HorizontalAlignment.Right,VerticalAlignment=Enum.VerticalAlignment.Bottom,Padding=UDim.new(0,8),SortOrder=Enum.SortOrder.LayoutOrder},toast)
+    make("UIPadding",{PaddingRight=UDim.new(0,18),PaddingBottom=UDim.new(0,18)},toast)
     local theme=selfWindow.Theme
     local main=make("Frame",{Name="MainWindow",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=config.Size or (UserInputService.TouchEnabled and UDim2.fromOffset(460,320) or UDim2.fromOffset(680,440)),BackgroundColor3=theme.Background,BackgroundTransparency=config.Acrylic==false and 0 or .10,ClipsDescendants=true},gui)
     selfWindow.Main=main; corner(main,12); stroke(main,theme.Border,.15)
@@ -369,8 +376,14 @@ function Aether:CreateWindow(config)
             end
             function section:CreateColorPicker(c)
                 c=c or {}; local f=row(c.Name,c.Description,48); local color=c.Default or theme.Accent
-                local swatch=button(f,"●",theme,28); swatch.Size=UDim2.fromOffset(54,28); swatch.Position=UDim2.new(1,-64,.5,-14); swatch.BackgroundColor3=color
-                swatch.MouseButton1Click:Connect(function() local h,s,v=Color3.toHSV(color); color=Color3.fromHSV((h+.08)%1,s,v); swatch.BackgroundColor3=color; safeCallback(c.Callback,color) end)
+                local swatch=button(f,"",theme,24); swatch.Size=UDim2.fromOffset(24,16); swatch.Position=UDim2.new(1,-36,.5,-8); swatch.BackgroundColor3=color
+                local palette=make("Frame",{Visible=false,Position=UDim2.new(1,-148,1,2),Size=UDim2.fromOffset(140,42),BackgroundColor3=Color3.fromRGB(17,21,29),ZIndex=18},f); corner(palette,8); stroke(palette,Color3.fromRGB(40,49,64),.05)
+                local colors={Color3.fromRGB(94,139,255),Color3.fromRGB(52,211,153),Color3.fromRGB(244,63,94),Color3.fromRGB(251,191,36),Color3.fromRGB(167,139,250)}
+                for index,preset in ipairs(colors) do
+                    local chip=make("TextButton",{AutoButtonColor=false,Text="",BackgroundColor3=preset,Position=UDim2.fromOffset(8+(index-1)*25,9),Size=UDim2.fromOffset(20,20),ZIndex=19},palette); corner(chip,5); stroke(chip,Color3.fromRGB(255,255,255),.7)
+                    chip.MouseButton1Click:Connect(function() color=preset; swatch.BackgroundColor3=color; palette.Visible=false; selfWindow.Values[c.Name or "ColorPicker"]=color; safeCallback(c.Callback,color) end)
+                end
+                swatch.MouseButton1Click:Connect(function() palette.Visible=not palette.Visible end)
                 return {Instance=f,GetValue=function() return color end,SetValue=function(v) if typeof(v)=="Color3" then color=v; swatch.BackgroundColor3=v; safeCallback(c.Callback,v) end end}
             end
             function section:CreateLabel(c) c=type(c)=="string" and {Text=c} or (c or {}); local f=card(container,theme,30); local l=text(f,c.Text or c.Name or "Label",12,theme.Text,false); l.Position=UDim2.fromOffset(10,0); return {Instance=f,SetText=function(v) l.Text=tostring(v) end} end
@@ -378,8 +391,29 @@ function Aether:CreateWindow(config)
             function section:CreateDivider() local f=make("Frame",{BackgroundColor3=theme.Border,BorderSizePixel=0,Size=UDim2.new(1,0,0,1)},container); return {Instance=f} end
             function section:CreateProgressBar(c) c=c or {}; local f=row(c.Name,c.Description,54); local track=make("Frame",{Position=UDim2.new(0,10,1,-17),Size=UDim2.new(1,-20,0,6),BackgroundColor3=theme.Border},f); corner(track,4); local fill=make("Frame",{Size=UDim2.new(math.clamp(c.Value or 0,0,100)/100,0,1,0),BackgroundColor3=theme.Accent},track); corner(fill,4); return {Instance=f,SetValue=function(_,v) fill.Size=UDim2.new(math.clamp(v,0,100)/100,0,1,0); safeCallback(c.Callback,v) end} end
             function section:CreateLoadingIndicator(c) c=c or {}; local f=row(c.Name or "Loading",c.Description,42); local spin=text(f,"◌",20,theme.Accent,true); spin.Position=UDim2.new(1,-34,0,4); spin.Size=UDim2.fromOffset(24,28); local active=true; task.spawn(function() while active and spin.Parent do spin.Rotation=(spin.Rotation+8)%360; RunService.Heartbeat:Wait() end end); return {Instance=f,Stop=function() active=false; f:Destroy() end} end
-            function section:CreateTooltip(c) c=c or {}; local f=row(c.Name or "Hover for details",c.Description,40); local hint=text(f,c.Tooltip or "Tooltip",10,theme.Muted,false); hint.Position=UDim2.fromOffset(10,19); return {Instance=f} end
-            function section:CreateContextMenu(c) c=c or {}; local f=row(c.Name or "Context menu",c.Description,42); local b=button(f,"Open menu",theme,28); b.Size=UDim2.fromOffset(100,28); b.Position=UDim2.new(1,-110,.5,-14); b.MouseButton2Click:Connect(function() selfWindow:Notify({Title="Context menu",Content=table.concat(c.Options or {"No actions"}," • ")}) end); return {Instance=f} end
+            function section:CreateTooltip(c)
+                c=c or {}; local f=row(c.Name or "Hover for details",c.Description,42)
+                local trigger=button(f,"?",theme,22); trigger.Size=UDim2.fromOffset(22,22); trigger.Position=UDim2.new(1,-32,.5,-11); trigger.TextSize=11
+                local tip=make("Frame",{Visible=false,Position=UDim2.new(1,-190,0,4),Size=UDim2.fromOffset(180,32),BackgroundColor3=Color3.fromRGB(17,21,29),ZIndex=20},f); corner(tip,6); stroke(tip,theme.Border,.05)
+                local tipText=text(tip,c.Tooltip or "Tooltip",10,theme.Text,false); tipText.Position=UDim2.fromOffset(8,2); tipText.Size=UDim2.new(1,-16,1,-4); tipText.TextWrapped=true; tipText.ZIndex=21
+                trigger.MouseEnter:Connect(function() tip.Visible=true end); trigger.MouseLeave:Connect(function() tip.Visible=false end)
+                return {Instance=f}
+            end
+            function section:CreateContextMenu(c)
+                c=c or {}; local f=row(c.Name or "Context menu",c.Description,42)
+                local b=button(f,"Open menu",theme,26); b.Size=UDim2.fromOffset(100,26); b.Position=UDim2.new(1,-110,.5,-13)
+                local popup=make("Frame",{Visible=false,Position=UDim2.new(1,-184,1,2),Size=UDim2.fromOffset(175,0),BackgroundColor3=Color3.fromRGB(17,21,29),ZIndex=20},f); corner(popup,8); stroke(popup,Color3.fromRGB(36,44,59),.05)
+                local layout=make("UIListLayout",{Padding=UDim.new(0,2),SortOrder=Enum.SortOrder.LayoutOrder},popup); make("UIPadding",{PaddingTop=UDim.new(0,4),PaddingBottom=UDim.new(0,4),PaddingLeft=UDim.new(0,4),PaddingRight=UDim.new(0,4)},popup)
+                for _,option in ipairs(c.Options or {"Copy","Reset"}) do
+                    local item=make("TextButton",{AutoButtonColor=false,Text=tostring(option),TextXAlignment=Enum.TextXAlignment.Left,Font=Enum.Font.Gotham,TextSize=11,TextColor3=theme.Text,BackgroundColor3=Color3.fromRGB(17,21,29),Size=UDim2.new(1,0,0,26),ZIndex=21},popup); corner(item,5)
+                    item.MouseEnter:Connect(function() item.BackgroundColor3=Color3.fromRGB(27,33,45) end); item.MouseLeave:Connect(function() item.BackgroundColor3=Color3.fromRGB(17,21,29) end)
+                    item.MouseButton1Click:Connect(function() popup.Visible=false; safeCallback(c.Callback,option); selfWindow:Notify({Title="Context menu",Content=tostring(option)}) end)
+                end
+                popup.Size=UDim2.fromOffset(175,math.min(#(c.Options or {"Copy","Reset"})*28+8,140))
+                b.MouseButton1Click:Connect(function() popup.Visible=not popup.Visible end)
+                b.MouseButton2Click:Connect(function() popup.Visible=not popup.Visible end)
+                return {Instance=f}
+            end
             function section:CreateModal(c) c=c or {}; local f=row(c.Name or "Modal",c.Description,42); local b=button(f,"Open modal",theme,28); b.Size=UDim2.fromOffset(100,28); b.Position=UDim2.new(1,-110,.5,-14); b.MouseButton1Click:Connect(function() selfWindow:ShowDialog(c) end); return {Instance=f} end
             function section:CreateSearchBar(c) c=c or {}; local f=row(c.Name or "Search",c.Description,58); local input=make("TextBox",{Position=UDim2.fromOffset(10,27),Size=UDim2.new(1,-20,0,24),BackgroundColor3=theme.Elevated,TextColor3=theme.Text,PlaceholderText=c.Placeholder or "Search…",Text="",Font=Enum.Font.Gotham,TextSize=11},f); corner(input,6); input:GetPropertyChangedSignal("Text"):Connect(function() safeCallback(c.Callback,input.Text) end); return {Instance=f,Input=input} end
             function section:CreateConfigurationManager(c) c=c or {}; local f=row(c.Name or "Configurations",c.Description,58); local b=button(f,"Save current",theme,28); b.Size=UDim2.fromOffset(110,28); b.Position=UDim2.new(1,-120,.5,-14); b.MouseButton1Click:Connect(function() selfWindow:SaveConfiguration(c.ConfigName or "Default"); selfWindow:Notify({Title="Configuration saved",Content=c.ConfigName or "Default"}) end); return {Instance=f} end
