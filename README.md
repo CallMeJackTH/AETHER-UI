@@ -10,13 +10,19 @@ A modular, premium dark-minimal Roblox UI library with a standalone HTML5 protot
 - `docs/` — API and architecture references.
 
 ## Installation (Roblox Studio)
-1. Create a Folder named `AETHER_UI` in `ReplicatedStorage`.
-2. Copy `src/init.lua` into a ModuleScript named `init` inside that folder.
-3. Add folders `Core`, `Modules`, and `Components`, then place the matching Lua files in them.
-4. Require it from a LocalScript: `local Aether = require(game.ReplicatedStorage.AETHER_UI)`.
-5. Run an example from `examples/` in a LocalScript.
+**Option A — modular source**
+1. Create a **ModuleScript** named `AETHER_UI` directly inside `ReplicatedStorage` (not a Folder).
+2. Paste the contents of `src/init.lua` into that ModuleScript.
+3. Add child Folders named `Core`, `Modules`, and `Components` under the `AETHER_UI` ModuleScript.
+4. Place `Theme.lua` inside `Core`, `Janitor.lua` inside `Modules`, and `Factory.lua` inside `Components`.
+5. In a LocalScript, use `local Aether = require(game.ReplicatedStorage.AETHER_UI)`.
 
-For the bundled build, place `build/AetherUI.lua` into a ModuleScript and require that ModuleScript. The `loadstring(HttpGet())` bootstrap in some executor environments is not a Roblox Studio deployment recommendation and may be disabled by the platform.
+**Option B — standalone build**
+1. Create a ModuleScript named `AETHER_UI` in `ReplicatedStorage`.
+2. Paste the complete contents of `build/AetherUI.lua` into it.
+3. Require it from a LocalScript with `local Aether = require(game.ReplicatedStorage.AETHER_UI)`.
+
+Run `examples/FullShowcase.lua` as a LocalScript to display the eight reference screens. `AetherShowcaseLoader.lua` is an optional remote loader for executor-style environments; it is not the Roblox Studio installation path.
 
 ## Quick start
 ```lua
