@@ -182,6 +182,9 @@ function Aether:CreateWindow(config)
     local theme=selfWindow.Theme
     local main=make("Frame",{Name="MainWindow",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=config.Size or (UserInputService.TouchEnabled and UDim2.fromOffset(460,320) or UDim2.fromOffset(680,440)),BackgroundColor3=theme.Background,BackgroundTransparency=config.Acrylic==false and 0 or .10,ClipsDescendants=true},gui)
     selfWindow.Main=main; corner(main,12); stroke(main,theme.Border,.15)
+    local restorePill=button(gui,"●  Aether Toggle",theme,32)
+    restorePill.Name="RestorePill"; restorePill.Size=UDim2.fromOffset(124,32); restorePill.Position=UDim2.fromOffset(18,18); restorePill.Visible=false; restorePill.ZIndex=60; corner(restorePill,18)
+    restorePill.MouseButton1Click:Connect(function() main.Visible=true; restorePill.Visible=false; selfWindow.Minimized=false end)
     if config.Acrylic~=false then
         local gradient=make("UIGradient",{Rotation=35,Color=ColorSequence.new({ColorSequenceKeypoint.new(0,theme.Surface),ColorSequenceKeypoint.new(1,theme.Background)}),Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,.18),NumberSequenceKeypoint.new(1,.02)})},main)
     end
@@ -194,8 +197,12 @@ function Aether:CreateWindow(config)
     local search=button(titlebar,"⌕  Search...   ⌘K",theme,24); search.Size=UDim2.fromOffset(132,24); search.Position=UDim2.new(1,-190,0,7); search.TextSize=10; search.TextColor3=theme.Muted
     local min=button(titlebar,"—",theme,24); min.Size=UDim2.fromOffset(24,24); min.Position=UDim2.new(1,-52,0,7)
     local close=button(titlebar,"×",theme,24); close.Size=UDim2.fromOffset(24,24); close.Position=UDim2.new(1,-26,0,7); close.TextColor3=theme.Muted
-    min.MouseButton1Click:Connect(function() selfWindow.Minimized=not selfWindow.Minimized; tween(main,.2,{Size=selfWindow.Minimized and UDim2.new(main.Size.X.Scale,main.Size.X.Offset,0,38) or (config.Size or (UserInputService.TouchEnabled and UDim2.fromOffset(460,320) or UDim2.fromOffset(680,440)))}); selfWindow.Body.Visible=not selfWindow.Minimized end)
-    close.MouseButton1Click:Connect(function() selfWindow:Destroy() end)
+    min.MouseButton1Click:Connect(function()
+        selfWindow.Minimized=true; main.Visible=false; restorePill.Visible=true
+    end)
+    close.MouseButton1Click:Connect(function()
+        selfWindow:ShowDialog({Title="Unload AETHER UI?",Content="This will disconnect active UI callbacks and destroy the ScreenGui.",CancelText="Cancel",ConfirmText="Confirm Unload",Callback=function() selfWindow:Destroy() end})
+    end)
     local dragging, dragStart, startPos=false,nil,nil
     selfWindow.Janitor:Add(titlebar.InputBegan:Connect(function(input)
         if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then dragging=true; dragStart=input.Position; startPos=main.Position end
@@ -252,6 +259,29 @@ function Aether:CreateWindow(config)
         end
         selfWindow.ActiveTab=tab
     end
+    local searchOverlay=make("Frame",{Name="CommandPaletteBackdrop",Visible=false,BackgroundColor3=Color3.new(0,0,0),BackgroundTransparency=.42,Size=UDim2.fromScale(1,1),ZIndex=40},main)
+    local searchPanel=make("Frame",{Name="CommandPalette",AnchorPoint=Vector2.new(.5,0),Position=UDim2.new(.5,0,0,42),Size=UDim2.fromOffset(340,210),BackgroundColor3=Color3.fromRGB(16,20,28),ZIndex=41},searchOverlay); corner(searchPanel,10); stroke(searchPanel,Color3.fromRGB(40,50,66),.05)
+    local searchInput=make("TextBox",{Position=UDim2.fromOffset(10,10),Size=UDim2.new(1,-20,0,30),BackgroundColor3=Color3.fromRGB(11,14,20),TextColor3=theme.Text,PlaceholderColor3=theme.Muted,PlaceholderText="Search flags, tabs or settings...",Text="",ClearTextOnFocus=false,Font=Enum.Font.Gotham,TextSize=11,ZIndex=42},searchPanel); corner(searchInput,6); stroke(searchInput,theme.Border,.15)
+    local searchResults=make("ScrollingFrame",{Position=UDim2.fromOffset(8,48),Size=UDim2.new(1,-16,1,-56),BackgroundTransparency=1,BorderSizePixel=0,CanvasSize=UDim2.new(),ScrollBarThickness=2,ZIndex=42},searchPanel)
+    local searchLayout=make("UIListLayout",{Padding=UDim.new(0,3),SortOrder=Enum.SortOrder.LayoutOrder},searchResults)
+    setCanvas(searchResults,searchLayout)
+    local function refreshSearch()
+        for _,child in ipairs(searchResults:GetChildren()) do if child:IsA("TextButton") then child:Destroy() end end
+        local query=string.lower(searchInput.Text)
+        for _,tab in ipairs(selfWindow.Tabs) do
+            if query=="" or string.find(string.lower(tab.Name),query,1,true) then
+                local result=button(searchResults,tab.Name.."     ›     "..tab.Name,theme,28)
+                result.TextXAlignment=Enum.TextXAlignment.Left; result.TextSize=11; result.ZIndex=43
+                result.MouseButton1Click:Connect(function() selectTab(tab); searchOverlay.Visible=false end)
+            end
+        end
+    end
+    searchInput:GetPropertyChangedSignal("Text"):Connect(refreshSearch)
+    search.MouseButton1Click:Connect(function() searchInput.Text=""; refreshSearch(); searchOverlay.Visible=true; searchInput:CaptureFocus() end)
+    searchOverlay.InputBegan:Connect(function(input) if input.UserInputType==Enum.UserInputType.MouseButton1 then searchOverlay.Visible=false end end)
+    selfWindow.Janitor:Add(UserInputService.InputBegan:Connect(function(input,processed)
+        if not processed and input.KeyCode==Enum.KeyCode.Escape then searchOverlay.Visible=false end
+    end))
     function selfWindow:CreateTab(tabConfig)
         tabConfig=tabConfig or {}
         local page=make("ScrollingFrame",{Name="Page_"..(tabConfig.Name or "Tab"),Visible=#selfWindow.Tabs==0,BackgroundTransparency=1,BorderSizePixel=0,Size=UDim2.fromScale(1,1),CanvasSize=UDim2.new(),ScrollBarThickness=3,ScrollBarImageColor3=theme.Accent},content)
@@ -360,7 +390,7 @@ function Aether:CreateWindow(config)
         return tab
     end
     function selfWindow:ShowDialog(c)
-        c=c or {}; local overlay=make("Frame",{BackgroundColor3=Color3.new(0,0,0),BackgroundTransparency=.35,Size=UDim2.fromScale(1,1),ZIndex=30},gui)
+        c=c or {}; local overlay=make("Frame",{Name="ModalBackdrop",BackgroundColor3=Color3.new(0,0,0),BackgroundTransparency=.42,Size=UDim2.fromScale(1,1),ZIndex=45},main)
         local panel=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.fromOffset(300,150),BackgroundColor3=theme.Surface,ZIndex=31},overlay); corner(panel,10); stroke(panel,theme.Border,.1)
         local t=text(panel,c.Title or "Confirm action",14,theme.Text,true); t.Position=UDim2.fromOffset(14,12); t.Size=UDim2.new(1,-28,0,24); t.ZIndex=32
         local d=text(panel,c.Content or c.Description or "Are you sure you want to continue?",11,theme.Muted,false); d.Position=UDim2.fromOffset(14,42); d.Size=UDim2.new(1,-28,0,50); d.TextWrapped=true; d.ZIndex=32
