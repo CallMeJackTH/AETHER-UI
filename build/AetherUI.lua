@@ -190,7 +190,7 @@ function Aether:CreateWindow(config)
     local main=make("Frame",{Name="MainWindow",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=config.Size or (UserInputService.TouchEnabled and UDim2.fromOffset(460,320) or UDim2.fromOffset(680,440)),BackgroundColor3=theme.Background,BackgroundTransparency=config.Acrylic==false and 0 or .10,ClipsDescendants=true},gui)
     selfWindow.Main=main; corner(main,12); stroke(main,theme.Border,.15)
     local restorePill=button(gui,"●  Aether Toggle",theme,32)
-    restorePill.Name="RestorePill"; restorePill.Size=UDim2.fromOffset(124,32); restorePill.Position=UDim2.fromOffset(18,18); restorePill.Visible=false; restorePill.ZIndex=60; corner(restorePill,18)
+    restorePill.Name="RestorePill"; restorePill.Size=UDim2.fromOffset(124,32); restorePill.Position=UDim2.fromOffset(18,18); restorePill.Visible=false; restorePill.ZIndex=60; local restoreCorner=restorePill:FindFirstChildOfClass("UICorner"); if restoreCorner then restoreCorner.CornerRadius=UDim.new(0,18) end
     restorePill.MouseButton1Click:Connect(function() main.Visible=true; restorePill.Visible=false; selfWindow.Minimized=false end)
     if config.Acrylic~=false then
         local gradient=make("UIGradient",{Rotation=35,Color=ColorSequence.new({ColorSequenceKeypoint.new(0,theme.Surface),ColorSequenceKeypoint.new(1,theme.Background)}),Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,.18),NumberSequenceKeypoint.new(1,.02)})},main)
@@ -277,7 +277,7 @@ function Aether:CreateWindow(config)
         local query=string.lower(searchInput.Text)
         for _,tab in ipairs(selfWindow.Tabs) do
             if query=="" or string.find(string.lower(tab.Name),query,1,true) then
-                local result=button(searchResults,tab.Name.."     ›     "..tab.Name,theme,28)
+                local result=button(searchResults,"Open "..tab.Name.."     ›     Navigation",theme,28)
                 result.TextXAlignment=Enum.TextXAlignment.Left; result.TextSize=11; result.ZIndex=43
                 result.MouseButton1Click:Connect(function() selectTab(tab); searchOverlay.Visible=false end)
             end
