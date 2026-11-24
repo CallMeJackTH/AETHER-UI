@@ -27,11 +27,11 @@ local Window = Aether:CreateWindow({
 })
 
 -- 01. DASHBOARD
-local Dashboard = Window:CreateTab({Name = "Dashboard", Icon = "▦"})
+local Dashboard = Window:CreateTab({Name = "Dashboard", Icon = "D"})
 local Overview = Dashboard:CreateSection("SYSTEM OVERVIEW")
 Overview:CreateParagraph({
     Title = "Welcome back, KairoDev",
-    Content = "UNDETECTED  •  Game detected: Phantom Arena [v4.18]  •  Client: Roblox Player"
+    Content = "UNDETECTED  |  Game detected: Phantom Arena [v4.18]  |  Client: Roblox Player"
 })
 Overview:CreateLabel("CLIENT FRAMERATE     143.8 FPS")
 Overview:CreateLabel("NETWORK LATENCY       28 ms")
@@ -49,7 +49,7 @@ Activity:CreateParagraph({Title = "AETHER UI Initialized", Content = "Loaded nav
 Activity:CreateProgressBar({Name = "Module Initialization", Value = 72})
 
 -- 02. COMBAT
-local Combat = Window:CreateTab({Name = "Combat", Icon = "◎"})
+local Combat = Window:CreateTab({Name = "Combat", Icon = "C"})
 local Targeting = Combat:CreateSection("TARGETING")
 Targeting:CreateToggle({Name = "Enable Aim Assistance", Description = "Toggle target assistance state.", Default = true, Callback = function(v) print("Aim Assistance:", v) end})
 Targeting:CreateKeybind({Name = "Aim Keybind", Description = "Set the activation key.", Default = Enum.KeyCode.ButtonR2, Callback = function(v) print("Aim key:", v.Name) end})
@@ -64,19 +64,19 @@ Hitbox:CreateToggle({Name = "Head Hitbox Scale", Default = true})
 Hitbox:CreateSlider({Name = "Multiplier", Min = 1, Max = 3, Default = 1.4})
 
 -- 03. VISUALS
-local Visuals = Window:CreateTab({Name = "Visuals", Icon = "◉"})
+local Visuals = Window:CreateTab({Name = "Visuals", Icon = "V"})
 local Esp = Visuals:CreateSection("ESP OVERLAY")
 Esp:CreateToggle({Name = "2D Corner Bounding Box", Default = true})
 Esp:CreateToggle({Name = "Health Bar & Nameplate", Default = true})
 Esp:CreateColorPicker({Name = "Enemy Visible Color", Default = Color3.fromRGB(94, 139, 255), Callback = function(c) print("ESP color:", c) end})
 Esp:CreateDropdown({Name = "Box Style", Options = {"Corner", "Full", "3D"}, Default = "Corner"})
-Esp:CreateParagraph({Title = "LIVE ESP PREVIEW", Content = "R15 Rig  •  Target_01 [82]  •  42 studs"})
+Esp:CreateParagraph({Title = "LIVE ESP PREVIEW", Content = "R15 Rig  |  Target_01 [82]  |  42 studs"})
 local VisualOptions = Visuals:CreateSection("VISUAL OPTIONS")
 VisualOptions:CreateToggle({Name = "Show Distance", Default = true})
 VisualOptions:CreateToggle({Name = "Team Color", Default = false})
 
 -- 04. SETTINGS
-local Settings = Window:CreateTab({Name = "Settings", Icon = "⚙"})
+local Settings = Window:CreateTab({Name = "Settings", Icon = "ST"})
 local Appearance = Settings:CreateSection("APPEARANCE")
 Appearance:CreateDropdown({Name = "Accent Theme Preset", Options = {"Obsidian Slate", "Carbon Indigo", "Midnight Emerald", "Crimson Graphite"}, Default = "Obsidian Slate", Callback = function(v) print("Accent preset:", v) end})
 Appearance:CreateSlider({Name = "Acrylic Surface Opacity", Min = 65, Max = 98, Default = 90})
@@ -86,7 +86,7 @@ Interface:CreateKeybind({Name = "Interface Toggle Keybind", Default = Enum.KeyCo
 Interface:CreateButton({Name = "Unload Interface", ButtonText = "Unload", Callback = function() Window:ShowDialog({Title = "Unload AETHER UI?", Content = "This will close the interface.", ConfirmText = "Unload", Callback = function() Window:Destroy() end}) end})
 
 -- 05. CONFIGURATIONS
-local Configs = Window:CreateTab({Name = "Configs", Icon = "☷"})
+local Configs = Window:CreateTab({Name = "Configs", Icon = "CF"})
 local Profiles = Configs:CreateSection("PROFILE MANAGER")
 Profiles:CreateTextbox({Name = "New Profile", Placeholder = "Enter new profile name..."})
 Profiles:CreateConfigurationManager({ConfigName = "Legit_Main"})
@@ -94,7 +94,7 @@ Profiles:CreateButton({Name = "Save Current Profile", ButtonText = "Save", Callb
 Profiles:CreateButton({Name = "Load Current Profile", ButtonText = "Load", Callback = function() local ok, err = Window:LoadConfiguration("Legit_Main"); if not ok then Window:Notify({Title = "Load Failed", Content = err}) end end})
 
 -- 06. COMPONENTS
-local Components = Window:CreateTab({Name = "Components", Icon = "✧"})
+local Components = Window:CreateTab({Name = "Components", Icon = "UI"})
 local KitchenSink = Components:CreateSection("ALL INTERACTIVE STATES & PRIMITIVES")
 KitchenSink:CreateButton({Name = "Button", Description = "Standard callback action.", ButtonText = "Run", Callback = function() Window:Notify({Title = "Primary Action", Content = "Button callback fired."}) end})
 KitchenSink:CreateToggle({Name = "Toggle ON / OFF", Default = true})
@@ -117,7 +117,7 @@ KitchenSink:CreateConfigurationManager({ConfigName = "Components"})
 KitchenSink:CreateThemeManager()
 
 -- 07. NOTIFICATIONS
-local Notifications = Window:CreateTab({Name = "Notifications", Icon = "♧"})
+local Notifications = Window:CreateTab({Name = "Notifications", Icon = "N"})
 local Toasts = Notifications:CreateSection("INTERACTIVE TOAST NOTIFICATIONS")
 Toasts:CreateButton({Name = "Info Notification", ButtonText = "Trigger Info", Callback = function() Window:Notify({Title = "System Info", Content = "Teleport service hook initialized."}) end})
 Toasts:CreateButton({Name = "Success Notification", ButtonText = "Trigger Success", Callback = function() Window:Notify({Title = "Profile Saved", Content = "Configuration written successfully."}) end})
@@ -125,7 +125,7 @@ Toasts:CreateButton({Name = "Warning Notification", ButtonText = "Trigger Warnin
 Toasts:CreateButton({Name = "Error Notification", ButtonText = "Trigger Error", Callback = function() Window:Notify({Title = "Hook Failed", Content = "Target event was not found."}) end})
 
 -- 08. MODALS
-local Modals = Window:CreateTab({Name = "Modals", Icon = "▣"})
+local Modals = Window:CreateTab({Name = "Modals", Icon = "M"})
 local Dialogs = Modals:CreateSection("DIALOGS, MODALS & CONTEXT MENUS")
 Dialogs:CreateButton({Name = "Confirmation Dialog", Description = "Backdrop dim and confirmation card.", ButtonText = "Open", Callback = function()
     Window:ShowDialog({Title = "Unload AETHER UI?", Content = "This will disconnect active UI callbacks and destroy the ScreenGui.", CancelText = "Cancel", ConfirmText = "Confirm", Callback = function() Window:Destroy() end})
