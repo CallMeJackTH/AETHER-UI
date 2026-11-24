@@ -53,7 +53,7 @@ function Aether:Notify(config)
     local frame=make("Frame",{Name="Toast",Size=UDim2.fromOffset(270,64),BackgroundColor3=Color3.fromRGB(14,17,23),BackgroundTransparency=.04,ZIndex=50,LayoutOrder=-math.floor(os.clock()*1000)},self.ToastLayer)
     corner(frame,9); stroke(frame,Color3.fromRGB(34,41,54),.05)
     local icon=make("Frame",{BackgroundColor3=Color3.fromRGB(25,37,61),Position=UDim2.fromOffset(10,10),Size=UDim2.fromOffset(24,24),ZIndex=51},frame); corner(icon,6); stroke(icon,self.Theme.Accent,.25)
-    local glyph=text(icon,"✓",13,self.Theme.Accent,true); glyph.TextXAlignment=Enum.TextXAlignment.Center; glyph.Size=UDim2.fromScale(1,1); glyph.ZIndex=52
+    local glyph=text(icon,"OK",13,self.Theme.Accent,true); glyph.TextXAlignment=Enum.TextXAlignment.Center; glyph.Size=UDim2.fromScale(1,1); glyph.ZIndex=52
     local title=text(frame,config.Title or "AETHER UI",12,self.Theme.Text,true); title.Position=UDim2.fromOffset(44,8); title.Size=UDim2.new(1,-56,0,18); title.ZIndex=51
     local body=text(frame,config.Content or config.Description or "Notification",10,self.Theme.Muted,false); body.Position=UDim2.fromOffset(44,27); body.Size=UDim2.new(1,-54,0,26); body.TextWrapped=true; body.ZIndex=51
     local timer=make("Frame",{BackgroundColor3=self.Theme.Accent,BorderSizePixel=0,Position=UDim2.new(0,0,1,-2),Size=UDim2.new(1,0,0,2),ZIndex=52},frame)
@@ -120,23 +120,35 @@ function Aether:CreateWindow(config)
     local theme=selfWindow.Theme
     local main=make("Frame",{Name="MainWindow",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=config.Size or (UserInputService.TouchEnabled and UDim2.fromOffset(460,320) or UDim2.fromOffset(680,440)),BackgroundColor3=theme.Background,BackgroundTransparency=config.Acrylic==false and 0 or .10,ClipsDescendants=true},gui)
     selfWindow.Main=main; corner(main,12); stroke(main,theme.Border,.15)
-    local restorePill=button(gui,"●  Aether Toggle",theme,32)
-    restorePill.Name="RestorePill"; restorePill.Size=UDim2.fromOffset(124,32); restorePill.Position=UDim2.fromOffset(18,18); restorePill.Visible=false; restorePill.ZIndex=60; local restoreCorner=restorePill:FindFirstChildOfClass("UICorner"); if restoreCorner then restoreCorner.CornerRadius=UDim.new(0,18) end
-    restorePill.MouseButton1Click:Connect(function() main.Visible=true; restorePill.Visible=false; selfWindow.Minimized=false end)
+    -- Floating launcher follows the web reference: dark acrylic pill with an accent status dot.
+    local floatingToggle=make("TextButton",{Name="AetherToggle",AutoButtonColor=false,Text="Aether Toggle",Font=Enum.Font.GothamMedium,TextSize=11,TextColor3=Color3.fromRGB(230,234,240),TextXAlignment=Enum.TextXAlignment.Left,BackgroundColor3=Color3.fromRGB(11,13,16),BackgroundTransparency=.12,Size=UDim2.fromOffset(116,32),Position=UDim2.fromOffset(18,18),ZIndex=60},gui)
+    corner(floatingToggle,18); stroke(floatingToggle,Color3.fromRGB(38,46,59),.08)
+    local togglePadding=make("UIPadding",{PaddingLeft=UDim.new(0,25),PaddingRight=UDim.new(0,9)},floatingToggle)
+    local toggleDot=make("Frame",{Name="StatusDot",BackgroundColor3=theme.Accent,BorderSizePixel=0,Position=UDim2.fromOffset(10,12),Size=UDim2.fromOffset(8,8),ZIndex=61},floatingToggle); corner(toggleDot,4)
+    local toggleDragging,toggleMoved,toggleDragStart,toggleStartPos=false,false,nil,nil
+    floatingToggle.InputBegan:Connect(function(input)
+        if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+            toggleDragging=true; toggleMoved=false; toggleDragStart=input.Position; toggleStartPos=floatingToggle.Position
+        end
+    end)
+    floatingToggle.MouseButton1Click:Connect(function()
+        if toggleMoved then toggleMoved=false; return end
+        main.Visible=not main.Visible; selfWindow.Minimized=not main.Visible
+    end)
     if config.Acrylic~=false then
         local gradient=make("UIGradient",{Rotation=35,Color=ColorSequence.new({ColorSequenceKeypoint.new(0,theme.Surface),ColorSequenceKeypoint.new(1,theme.Background)}),Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,.18),NumberSequenceKeypoint.new(1,.02)})},main)
     end
     local titlebar=make("Frame",{Name="TitleBar",Size=UDim2.new(1,0,0,38),BackgroundColor3=Color3.fromRGB(14,17,22),BackgroundTransparency=.35,BorderSizePixel=0},main)
     local titleLine=make("Frame",{BackgroundColor3=Color3.fromRGB(26,31,40),BorderSizePixel=0,Position=UDim2.new(0,0,1,-1),Size=UDim2.new(1,0,0,1)},titlebar)
     local logo=make("Frame",{BackgroundColor3=Color3.fromRGB(25,37,61),Position=UDim2.fromOffset(14,9),Size=UDim2.fromOffset(20,20)},titlebar); corner(logo,6); stroke(logo,theme.Accent,.35)
-    local logoText=text(logo,"◇",13,theme.Accent,true); logoText.TextXAlignment=Enum.TextXAlignment.Center; logoText.Size=UDim2.fromScale(1,1)
+    local logoText=text(logo,"A",11,theme.Accent,true); logoText.TextXAlignment=Enum.TextXAlignment.Center; logoText.Size=UDim2.fromScale(1,1)
     local brand=text(titlebar,config.Title or "Aether Framework",13,theme.Text,true); brand.Position=UDim2.fromOffset(42,0); brand.Size=UDim2.new(0,180,1,0)
     local version=make("TextLabel",{BackgroundColor3=Color3.fromRGB(22,27,35),BorderSizePixel=0,Position=UDim2.fromOffset(224,9),Size=UDim2.fromOffset(38,19),Text="v2.4",Font=Enum.Font.Code,TextSize=10,TextColor3=theme.Muted},titlebar); corner(version,4); stroke(version,theme.Border,.2)
-    local search=button(titlebar,"⌕  Search...   ⌘K",theme,24); search.Size=UDim2.fromOffset(132,24); search.Position=UDim2.new(1,-190,0,7); search.TextSize=10; search.TextColor3=theme.Muted
-    local min=button(titlebar,"—",theme,24); min.Size=UDim2.fromOffset(24,24); min.Position=UDim2.new(1,-52,0,7)
-    local close=button(titlebar,"×",theme,24); close.Size=UDim2.fromOffset(24,24); close.Position=UDim2.new(1,-26,0,7); close.TextColor3=theme.Muted
+    local search=button(titlebar,"Search  /  Ctrl K",theme,24); search.Size=UDim2.fromOffset(132,24); search.Position=UDim2.new(1,-190,0,7); search.TextSize=10; search.TextColor3=theme.Muted
+    local min=button(titlebar,"-",theme,24); min.Size=UDim2.fromOffset(24,24); min.Position=UDim2.new(1,-52,0,7)
+    local close=button(titlebar,"X",theme,24); close.Size=UDim2.fromOffset(24,24); close.Position=UDim2.new(1,-26,0,7); close.TextColor3=theme.Muted
     min.MouseButton1Click:Connect(function()
-        selfWindow.Minimized=true; main.Visible=false; restorePill.Visible=true
+        selfWindow.Minimized=true; main.Visible=false
     end)
     close.MouseButton1Click:Connect(function()
         selfWindow:ShowDialog({Title="Unload AETHER UI?",Content="This will disconnect active UI callbacks and destroy the ScreenGui.",CancelText="Cancel",ConfirmText="Confirm Unload",Callback=function() selfWindow:Destroy() end})
@@ -149,8 +161,17 @@ function Aether:CreateWindow(config)
         if dragging and (input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch) then
             local delta=input.Position-dragStart; main.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,startPos.Y.Scale,startPos.Y.Offset+delta.Y)
         end
+        if toggleDragging and (input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch) then
+            local delta=input.Position-toggleDragStart
+            if math.abs(delta.X)+math.abs(delta.Y)>5 then toggleMoved=true end
+            if toggleMoved then floatingToggle.Position=UDim2.new(toggleStartPos.X.Scale,toggleStartPos.X.Offset+delta.X,toggleStartPos.Y.Scale,toggleStartPos.Y.Offset+delta.Y) end
+        end
     end))
-    selfWindow.Janitor:Add(UserInputService.InputEnded:Connect(function(input) if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then dragging=false end end))
+    selfWindow.Janitor:Add(UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+            dragging=false; toggleDragging=false
+        end
+    end))
     local body=make("Frame",{Name="Body",Position=UDim2.fromOffset(0,38),Size=UDim2.new(1,0,1,-38),BackgroundTransparency=1},main); selfWindow.Body=body
     local sidebar=make("Frame",{Name="Sidebar",Size=UDim2.new(0,165,1,0),BackgroundColor3=Color3.fromRGB(13,16,21),BackgroundTransparency=.25,BorderSizePixel=0},body); selfWindow.Sidebar=sidebar
     local sideLine=make("Frame",{BackgroundColor3=Color3.fromRGB(26,31,40),BorderSizePixel=0,Position=UDim2.new(1,-1,0,0),Size=UDim2.new(0,1,1,0)},sidebar)
@@ -160,7 +181,7 @@ function Aether:CreateWindow(config)
     local avatar=make("Frame",{BackgroundColor3=Color3.fromRGB(48,60,81),Position=UDim2.fromOffset(8,7),Size=UDim2.fromOffset(24,24)},footerCard); corner(avatar,12)
     local avatarText=text(avatar,"K",10,Color3.fromRGB(245,247,251),true); avatarText.TextXAlignment=Enum.TextXAlignment.Center; avatarText.Size=UDim2.fromScale(1,1)
     local userName=text(footerCard,config.UserName or "KairoDev",11,theme.Text,true); userName.Position=UDim2.fromOffset(39,4); userName.Size=UDim2.new(1,-44,0,15)
-    local userMeta=text(footerCard,"Lifetime  •  UID 0142",9,theme.Muted,false); userMeta.Position=UDim2.fromOffset(39,19); userMeta.Size=UDim2.new(1,-44,0,13)
+    local userMeta=text(footerCard,"Lifetime  |  UID 0142",9,theme.Muted,false); userMeta.Position=UDim2.fromOffset(39,19); userMeta.Size=UDim2.new(1,-44,0,13)
     local content=make("Frame",{Name="Content",Position=UDim2.new(0,165,0,0),Size=UDim2.new(1,-165,1,0),BackgroundTransparency=1},body); selfWindow.Content=content
     local scale=make("UIScale",{Scale=1},main)
     local compact=false
@@ -175,12 +196,28 @@ function Aether:CreateWindow(config)
         footerCard.Position=compact and UDim2.new(0,8,1,-38) or UDim2.new(0,8,1,-46)
         avatar.Position=compact and UDim2.fromOffset(3,3) or UDim2.fromOffset(8,7)
         userName.Visible=not compact; userMeta.Visible=not compact
-        scale.Scale=compact and math.min(1,viewport.X/490,viewport.Y/350) or 1
+        floatingToggle.Size=compact and UDim2.fromOffset(36,36) or UDim2.fromOffset(116,32)
+        floatingToggle.Text=compact and "A" or "Aether Toggle"
+        floatingToggle.TextXAlignment=compact and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
+        floatingToggle.TextSize=compact and 14 or 11
+        toggleDot.Visible=not compact
+        togglePadding.PaddingLeft=UDim.new(0,compact and 0 or 25)
+        floatingToggle:FindFirstChildOfClass("UICorner").CornerRadius=UDim.new(0,compact and 18 or 18)
+        scale.Scale=compact and math.min(1,(viewport.X-24)/460,(viewport.Y-48)/320) or 1
+        search.Size=compact and UDim2.fromOffset(94,24) or UDim2.fromOffset(132,24)
+        search.Position=compact and UDim2.new(1,-152,0,7) or UDim2.new(1,-190,0,7)
+        search.Text=compact and "Search" or "Search  /  Ctrl K"
+        version.Visible=not compact
+        brand.Size=UDim2.new(0,compact and 150 or 180,1,0)
+        for _,child in ipairs(nav:GetChildren()) do
+            if child:IsA("TextLabel") and string.sub(child.Name,1,9)=="NavGroup_" then child.Visible=not compact end
+        end
         for _,t in ipairs(selfWindow.Tabs) do
             if t.Nav then
-                t.Nav.Text=compact and (" "..t.Glyph) or ("   "..t.Glyph.."    "..t.Name)
+                t.Nav.Text=compact and t.Glyph or ("   "..t.Glyph.."    "..t.Name)
                 t.Nav.TextXAlignment=compact and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
-                t.Nav.TextSize=compact and 14 or 12
+                t.Nav.TextSize=12
+                t.Nav.Size=UDim2.new(1,0,0,compact and 40 or 30)
             end
         end
     end
@@ -208,7 +245,7 @@ function Aether:CreateWindow(config)
         local query=string.lower(searchInput.Text)
         for _,tab in ipairs(selfWindow.Tabs) do
             if query=="" or string.find(string.lower(tab.Name),query,1,true) then
-                local result=button(searchResults,"Open "..tab.Name.."     ›     Navigation",theme,28)
+                local result=button(searchResults,"Open "..tab.Name.."     >     Navigation",theme,28)
                 result.TextXAlignment=Enum.TextXAlignment.Left; result.TextSize=11; result.ZIndex=43
                 result.MouseButton1Click:Connect(function() selectTab(tab); searchOverlay.Visible=false end)
             end
@@ -232,7 +269,7 @@ function Aether:CreateWindow(config)
             local sectionLabel=text(nav,group,10,Color3.fromRGB(92,103,121),true); sectionLabel.Name="NavGroup_"..group; sectionLabel.Size=UDim2.new(1,0,0,20); sectionLabel.TextXAlignment=Enum.TextXAlignment.Left; sectionLabel.LayoutOrder=groupOrder[group] or (#selfWindow.Tabs*2)
             selfWindow.NavGroups[group]=true
         end
-        local glyph=tabConfig.Icon or ({Dashboard="▦",Combat="◎",Visuals="◉",Components="✧",Showcase="✧",Configs="☷",Settings="⚙",Notifications="♧",Modals="▣"})[tabName] or "◇"
+        local glyph=tabConfig.Icon or ({Dashboard="D",Combat="C",Visuals="V",Components="UI",Showcase="S",Configs="CF",Settings="ST",Notifications="N",Modals="M"})[tabName] or "A"
         local navButton=button(nav,"   "..glyph.."    "..tabName,theme,30); navButton.Name="Nav_"..tabName; navButton.TextXAlignment=Enum.TextXAlignment.Left; navButton.TextTruncate=Enum.TextTruncate.AtEnd; navButton.TextSize=12; navButton.LayoutOrder=tabOrder[tabName] or (30+#selfWindow.Tabs*2)
         local activeMark=make("Frame",{Name="ActiveIndicator",BackgroundColor3=theme.Accent,BorderSizePixel=0,Position=UDim2.fromOffset(0,7),Size=UDim2.fromOffset(3,16),Visible=#selfWindow.Tabs==0},navButton); corner(activeMark,2)
         local tab={Name=tabName,Page=page,Nav=navButton,Indicator=activeMark,Glyph=glyph,Window=selfWindow}
@@ -277,33 +314,33 @@ function Aether:CreateWindow(config)
             end
             function section:CreateDropdown(c)
                 c=c or {}; local f=row(c.Name,c.Description,48); local current=c.Default
-                local b=button(f,tostring(current or "Select…").."  ▾",theme,28); b.Size=UDim2.fromOffset(140,28); b.Position=UDim2.new(1,-150,.5,-14)
+                local b=button(f,tostring(current or "Select...").."  v",theme,28); b.Size=UDim2.fromOffset(140,28); b.Position=UDim2.new(1,-150,.5,-14)
                 local popup=make("Frame",{Visible=false,Position=UDim2.new(1,-150,1,2),Size=UDim2.fromOffset(140,0),BackgroundColor3=theme.Elevated,ZIndex=8},f); corner(popup,7); stroke(popup,theme.Border,.1)
                 local pl=make("UIListLayout",{SortOrder=Enum.SortOrder.LayoutOrder},popup)
                 local function refresh() for _,v in ipairs(popup:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
-                    for _,option in ipairs(c.Options or {}) do local ob=make("TextButton",{Text=tostring(option),Font=Enum.Font.Gotham,TextSize=11,TextColor3=theme.Text,BackgroundTransparency=1,Size=UDim2.new(1,0,0,27),ZIndex=9},popup); ob.MouseButton1Click:Connect(function() current=option; b.Text=tostring(option).."  ▾"; popup.Visible=false; selfWindow.Values[c.Name or "Dropdown"]=current; safeCallback(c.Callback,current) end) end
+                    for _,option in ipairs(c.Options or {}) do local ob=make("TextButton",{Text=tostring(option),Font=Enum.Font.Gotham,TextSize=11,TextColor3=theme.Text,BackgroundTransparency=1,Size=UDim2.new(1,0,0,27),ZIndex=9},popup); ob.MouseButton1Click:Connect(function() current=option; b.Text=tostring(option).."  v"; popup.Visible=false; selfWindow.Values[c.Name or "Dropdown"]=current; safeCallback(c.Callback,current) end) end
                     popup.Size=UDim2.fromOffset(140,math.min(#(c.Options or {})*27,135))
                 end
                 refresh(); b.MouseButton1Click:Connect(function() popup.Visible=not popup.Visible end)
-                return {Instance=f,GetValue=function() return current end,SetValue=function(v) current=v; b.Text=tostring(v).."  ▾"; safeCallback(c.Callback,v) end}
+                return {Instance=f,GetValue=function() return current end,SetValue=function(v) current=v; b.Text=tostring(v).."  v"; safeCallback(c.Callback,v) end}
             end
             function section:CreateMultiDropdown(c)
                 c=c or {}; local selected={}; for _,v in ipairs(c.Default or {}) do selected[v]=true end
-                local f=row(c.Name,c.Description,64); local b=button(f,"Choose options…  ▾",theme,28); b.Position=UDim2.new(1,-150,.5,-14); b.Size=UDim2.fromOffset(140,28)
+                local f=row(c.Name,c.Description,64); local b=button(f,"Choose options...  v",theme,28); b.Position=UDim2.new(1,-150,.5,-14); b.Size=UDim2.fromOffset(140,28)
                 local popup=make("Frame",{Visible=false,Position=UDim2.new(1,-150,1,2),Size=UDim2.fromOffset(140,0),BackgroundColor3=theme.Elevated,ZIndex=8},f); corner(popup,7)
-                for _,option in ipairs(c.Options or {}) do local ob=make("TextButton",{Text=(selected[option] and "☑ " or "□ ")..tostring(option),Font=Enum.Font.Gotham,TextSize=11,TextColor3=theme.Text,BackgroundTransparency=1,Size=UDim2.new(1,0,0,27),ZIndex=9},popup); ob.MouseButton1Click:Connect(function() selected[option]=not selected[option]; ob.Text=(selected[option] and "☑ " or "□ ")..tostring(option); local values={}; for _,v in ipairs(c.Options) do if selected[v] then table.insert(values,v) end end; b.Text=#values.." selected  ▾"; safeCallback(c.Callback,values) end) end
+                for _,option in ipairs(c.Options or {}) do local ob=make("TextButton",{Text=(selected[option] and "[x] " or "[ ] ")..tostring(option),Font=Enum.Font.Gotham,TextSize=11,TextColor3=theme.Text,BackgroundTransparency=1,Size=UDim2.new(1,0,0,27),ZIndex=9},popup); ob.MouseButton1Click:Connect(function() selected[option]=not selected[option]; ob.Text=(selected[option] and "[x] " or "[ ] ")..tostring(option); local values={}; for _,v in ipairs(c.Options) do if selected[v] then table.insert(values,v) end end; b.Text=#values.." selected  v"; safeCallback(c.Callback,values) end) end
                 popup.Size=UDim2.fromOffset(140,math.min(#(c.Options or {})*27,135)); b.MouseButton1Click:Connect(function() popup.Visible=not popup.Visible end)
                 return {Instance=f,GetValue=function() local a={}; for _,v in ipairs(c.Options or {}) do if selected[v] then table.insert(a,v) end end; return a end}
             end
             function section:CreateTextbox(c)
-                c=c or {}; local f=row(c.Name,c.Description,62); local input=make("TextBox",{Position=UDim2.new(0,10,1,-34),Size=UDim2.new(1,-20,0,26),BackgroundColor3=theme.Elevated,TextColor3=theme.Text,PlaceholderColor3=theme.Muted,PlaceholderText=c.Placeholder or "Enter text…",Text=c.Default or "",Font=Enum.Font.Gotham,TextSize=11,ClearTextOnFocus=false},f); corner(input,6); stroke(input,theme.Border,.2)
+                c=c or {}; local f=row(c.Name,c.Description,62); local input=make("TextBox",{Position=UDim2.new(0,10,1,-34),Size=UDim2.new(1,-20,0,26),BackgroundColor3=theme.Elevated,TextColor3=theme.Text,PlaceholderColor3=theme.Muted,PlaceholderText=c.Placeholder or "Enter text...",Text=c.Default or "",Font=Enum.Font.Gotham,TextSize=11,ClearTextOnFocus=false},f); corner(input,6); stroke(input,theme.Border,.2)
                 input.FocusLost:Connect(function(enter) selfWindow.Values[c.Name or "Textbox"]=input.Text; safeCallback(c.Callback,input.Text,enter) end)
                 return {Instance=f,Input=input,GetValue=function() return input.Text end,SetValue=function(v) input.Text=tostring(v) end}
             end
             function section:CreateKeybind(c)
                 c=c or {}; local f=row(c.Name,c.Description,48); local key=c.Default or Enum.KeyCode.RightShift; local listening=false
                 local b=button(f,key.Name,theme,28); b.Size=UDim2.fromOffset(90,28); b.Position=UDim2.new(1,-100,.5,-14)
-                b.MouseButton1Click:Connect(function() listening=true; b.Text="Press key…" end)
+                b.MouseButton1Click:Connect(function() listening=true; b.Text="Press key..." end)
                 local conn=UserInputService.InputBegan:Connect(function(input,processed) if listening and not processed and input.UserInputType==Enum.UserInputType.Keyboard then key=input.KeyCode; listening=false; b.Text=key.Name; safeCallback(c.Callback,key) elseif not processed and input.KeyCode==key then safeCallback(c.Callback,key) end end); selfWindow.Janitor:Add(conn)
                 return {Instance=f,GetValue=function() return key end}
             end
@@ -323,7 +360,7 @@ function Aether:CreateWindow(config)
             function section:CreateParagraph(c) c=c or {}; local f=card(container,theme,64); local t=text(f,c.Title or c.Name or "Information",12,theme.Text,true); t.Position=UDim2.fromOffset(10,5); local d=text(f,c.Content or c.Description or "",10,theme.Muted,false); d.Position=UDim2.fromOffset(10,25); d.Size=UDim2.new(1,-20,0,34); d.TextWrapped=true; d.TextYAlignment=Enum.TextYAlignment.Top; return {Instance=f} end
             function section:CreateDivider() local f=make("Frame",{BackgroundColor3=theme.Border,BorderSizePixel=0,Size=UDim2.new(1,0,0,1)},container); return {Instance=f} end
             function section:CreateProgressBar(c) c=c or {}; local f=row(c.Name,c.Description,54); local track=make("Frame",{Position=UDim2.new(0,10,1,-17),Size=UDim2.new(1,-20,0,6),BackgroundColor3=theme.Border},f); corner(track,4); local fill=make("Frame",{Size=UDim2.new(math.clamp(c.Value or 0,0,100)/100,0,1,0),BackgroundColor3=theme.Accent},track); corner(fill,4); return {Instance=f,SetValue=function(_,v) fill.Size=UDim2.new(math.clamp(v,0,100)/100,0,1,0); safeCallback(c.Callback,v) end} end
-            function section:CreateLoadingIndicator(c) c=c or {}; local f=row(c.Name or "Loading",c.Description,42); local spin=text(f,"◌",20,theme.Accent,true); spin.Position=UDim2.new(1,-34,0,4); spin.Size=UDim2.fromOffset(24,28); local active=true; task.spawn(function() while active and spin.Parent do spin.Rotation=(spin.Rotation+8)%360; RunService.Heartbeat:Wait() end end); return {Instance=f,Stop=function() active=false; f:Destroy() end} end
+            function section:CreateLoadingIndicator(c) c=c or {}; local f=row(c.Name or "Loading",c.Description,42); local spin=text(f,"O",20,theme.Accent,true); spin.Position=UDim2.new(1,-34,0,4); spin.Size=UDim2.fromOffset(24,28); local active=true; task.spawn(function() while active and spin.Parent do spin.Rotation=(spin.Rotation+8)%360; RunService.Heartbeat:Wait() end end); return {Instance=f,Stop=function() active=false; f:Destroy() end} end
             function section:CreateTooltip(c)
                 c=c or {}; local f=row(c.Name or "Hover for details",c.Description,42)
                 local trigger=button(f,"?",theme,22); trigger.Size=UDim2.fromOffset(22,22); trigger.Position=UDim2.new(1,-32,.5,-11); trigger.TextSize=11
@@ -348,7 +385,7 @@ function Aether:CreateWindow(config)
                 return {Instance=f}
             end
             function section:CreateModal(c) c=c or {}; local f=row(c.Name or "Modal",c.Description,42); local b=button(f,"Open modal",theme,28); b.Size=UDim2.fromOffset(100,28); b.Position=UDim2.new(1,-110,.5,-14); b.MouseButton1Click:Connect(function() selfWindow:ShowDialog(c) end); return {Instance=f} end
-            function section:CreateSearchBar(c) c=c or {}; local f=row(c.Name or "Search",c.Description,58); local input=make("TextBox",{Position=UDim2.fromOffset(10,27),Size=UDim2.new(1,-20,0,24),BackgroundColor3=theme.Elevated,TextColor3=theme.Text,PlaceholderText=c.Placeholder or "Search…",Text="",Font=Enum.Font.Gotham,TextSize=11},f); corner(input,6); input:GetPropertyChangedSignal("Text"):Connect(function() safeCallback(c.Callback,input.Text) end); return {Instance=f,Input=input} end
+            function section:CreateSearchBar(c) c=c or {}; local f=row(c.Name or "Search",c.Description,58); local input=make("TextBox",{Position=UDim2.fromOffset(10,27),Size=UDim2.new(1,-20,0,24),BackgroundColor3=theme.Elevated,TextColor3=theme.Text,PlaceholderText=c.Placeholder or "Search...",Text="",Font=Enum.Font.Gotham,TextSize=11},f); corner(input,6); input:GetPropertyChangedSignal("Text"):Connect(function() safeCallback(c.Callback,input.Text) end); return {Instance=f,Input=input} end
             function section:CreateConfigurationManager(c) c=c or {}; local f=row(c.Name or "Configurations",c.Description,58); local b=button(f,"Save current",theme,28); b.Size=UDim2.fromOffset(110,28); b.Position=UDim2.new(1,-120,.5,-14); b.MouseButton1Click:Connect(function() selfWindow:SaveConfiguration(c.ConfigName or "Default"); selfWindow:Notify({Title="Configuration saved",Content=c.ConfigName or "Default"}) end); return {Instance=f} end
             function section:CreateThemeManager() local f=row("Theme Manager","Switch the active interface palette.",52); local b=button(f,"Cycle theme",theme,28); b.Size=UDim2.fromOffset(110,28); b.Position=UDim2.new(1,-120,.5,-14); b.MouseButton1Click:Connect(function() local names={"Dark","Midnight","Light"}; local index=table.find(names,selfWindow.ThemeName) or 1; selfWindow:SetTheme(names[index%#names+1]) end); return {Instance=f} end
             return section
