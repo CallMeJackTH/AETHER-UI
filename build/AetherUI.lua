@@ -193,6 +193,8 @@ function Aether:CreateWindow(config)
     -- Floating launcher follows the web reference: dark acrylic pill with an accent status dot.
     local floatingToggle=make("TextButton",{Name="AetherToggle",AutoButtonColor=false,Text="Aether Toggle",Font=Enum.Font.GothamMedium,TextSize=11,TextColor3=Color3.fromRGB(230,234,240),TextXAlignment=Enum.TextXAlignment.Left,BackgroundColor3=Color3.fromRGB(11,13,16),BackgroundTransparency=.12,Size=UDim2.fromOffset(116,32),Position=UDim2.fromOffset(18,18),ZIndex=60},gui)
     corner(floatingToggle,18); stroke(floatingToggle,Color3.fromRGB(38,46,59),.08)
+    floatingToggle.MouseEnter:Connect(function() tween(floatingToggle,.12,{BackgroundColor3=Color3.fromRGB(20,24,32)}) end)
+    floatingToggle.MouseLeave:Connect(function() tween(floatingToggle,.12,{BackgroundColor3=Color3.fromRGB(11,13,16)}) end)
     local togglePadding=make("UIPadding",{PaddingLeft=UDim.new(0,25),PaddingRight=UDim.new(0,9)},floatingToggle)
     local toggleDot=make("Frame",{Name="StatusDot",BackgroundColor3=theme.Accent,BorderSizePixel=0,Position=UDim2.fromOffset(10,12),Size=UDim2.fromOffset(8,8),ZIndex=61},floatingToggle); corner(toggleDot,4)
     local toggleDragging,toggleMoved,toggleDragStart,toggleStartPos=false,false,nil,nil
