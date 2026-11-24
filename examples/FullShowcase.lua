@@ -1,23 +1,185 @@
-local Aether = require(game.ReplicatedStorage.AETHER_UI)
-local Window = Aether:CreateWindow({Title="AETHER UI",Subtitle="Full Component Showcase",Size=UDim2.fromOffset(680,500),Theme="Dark",Acrylic=true})
-local Tab = Window:CreateTab({Name="Showcase",Icon="sparkles"})
-local S = Tab:CreateSection("All controls")
-S:CreateButton({Name="Button",Callback=function() Window:Notify({Title="Button",Content="Callback fired."}) end})
-S:CreateToggle({Name="Toggle",Default=true,Callback=function(v) print(v) end})
-S:CreateSlider({Name="Slider",Min=1,Max=10,Default=5,Callback=print})
-S:CreateDropdown({Name="Dropdown",Options={"One","Two","Three"},Callback=print})
-S:CreateMultiDropdown({Name="Multi dropdown",Options={"A","B","C"},Callback=function(v) print(table.concat(v,",")) end})
-S:CreateTextbox({Name="Textbox",Callback=print})
-S:CreateKeybind({Name="Keybind",Default=Enum.KeyCode.G,Callback=print})
-S:CreateColorPicker({Name="Color picker",Callback=print})
-S:CreateLabel("Label component")
-S:CreateParagraph({Title="Paragraph",Content="A longer description for an interface control."})
-S:CreateDivider()
-S:CreateSearchBar({Name="Search bar",Callback=print})
-S:CreateProgressBar({Name="Progress",Value=45})
-S:CreateLoadingIndicator({Name="Loading indicator"})
-S:CreateTooltip({Name="Tooltip",Tooltip="Helpful contextual information"})
-S:CreateContextMenu({Name="Context menu",Options={"Copy","Reset"}})
-S:CreateModal({Name="Modal",Title="Example modal",Content="Modal content",Callback=function() print("Accepted") end})
-S:CreateConfigurationManager({ConfigName="Showcase"})
-S:CreateThemeManager()
+-- AETHER UI Full Showcase
+-- Executor entry point: fetches the standalone library build from GitHub.
+-- Keep this file independent from ReplicatedStorage / ModuleScript installation.
+
+local LIBRARY_URL = "https://raw.githubusercontent.com/CallMeJackTH/AETHER-UI/main/build/AetherUI.lua"
+
+local function loadLibrary()
+    local ok, source = pcall(function()
+        return game:HttpGet(LIBRARY_URL)
+    end)
+
+    if not ok then
+        error("[AETHER UI] Could not download library: " .. tostring(source))
+    end
+
+    if type(source) ~= "string" or source == "" then
+        error("[AETHER UI] Library download returned empty content.")
+    end
+
+    local compileOk, chunk = pcall(loadstring, source)
+    if not compileOk or type(chunk) ~= "function" then
+        error("[AETHER UI] Library compilation failed: " .. tostring(chunk))
+    end
+
+    local runOk, library = pcall(chunk)
+    if not runOk then
+        error("[AETHER UI] Library initialization failed: " .. tostring(library))
+    end
+
+    if type(library) ~= "table" or type(library.CreateWindow) ~= "function" then
+        error("[AETHER UI] Invalid library build: CreateWindow API is missing.")
+    end
+
+    return library
+end
+
+local ok, err = pcall(function()
+    local Aether = loadLibrary()
+
+    local Window = Aether:CreateWindow({
+        Title = "AETHER UI",
+        Subtitle = "Full Component Showcase",
+        Size = UDim2.fromOffset(680, 500),
+        Theme = "Dark",
+        Acrylic = true
+    })
+
+    local Tab = Window:CreateTab({
+        Name = "Showcase",
+        Icon = "sparkles"
+    })
+
+    local Section = Tab:CreateSection("All Components")
+
+    Section:CreateButton({
+        Name = "Button",
+        Description = "Click to test the button callback.",
+        ButtonText = "Run",
+        Callback = function()
+            Window:Notify({
+                Title = "Button",
+                Content = "Callback fired."
+            })
+        end
+    })
+
+    Section:CreateToggle({
+        Name = "Toggle",
+        Default = true,
+        Callback = function(value)
+            print("[AETHER UI] Toggle:", value)
+        end
+    })
+
+    Section:CreateSlider({
+        Name = "Slider",
+        Min = 1,
+        Max = 10,
+        Default = 5,
+        Callback = function(value)
+            print("[AETHER UI] Slider:", value)
+        end
+    })
+
+    Section:CreateDropdown({
+        Name = "Dropdown",
+        Options = {"One", "Two", "Three"},
+        Default = "One",
+        Callback = function(value)
+            print("[AETHER UI] Dropdown:", value)
+        end
+    })
+
+    Section:CreateMultiDropdown({
+        Name = "Multi Dropdown",
+        Options = {"Alpha", "Beta", "Gamma"},
+        Default = {"Alpha"},
+        Callback = function(values)
+            print("[AETHER UI] Multi Dropdown:", table.concat(values, ", "))
+        end
+    })
+
+    Section:CreateTextbox({
+        Name = "Textbox",
+        Placeholder = "Enter some text...",
+        Callback = function(value)
+            print("[AETHER UI] Textbox:", value)
+        end
+    })
+
+    Section:CreateKeybind({
+        Name = "Keybind",
+        Default = Enum.KeyCode.G,
+        Callback = function(value)
+            print("[AETHER UI] Keybind:", value)
+        end
+    })
+
+    Section:CreateColorPicker({
+        Name = "Color Picker",
+        Callback = function(value)
+            print("[AETHER UI] Color:", value)
+        end
+    })
+
+    Section:CreateLabel("Label component")
+
+    Section:CreateParagraph({
+        Title = "Paragraph",
+        Content = "A longer description for an interface control."
+    })
+
+    Section:CreateDivider()
+
+    Section:CreateSearchBar({
+        Name = "Search Bar",
+        Placeholder = "Search...",
+        Callback = function(value)
+            print("[AETHER UI] Search:", value)
+        end
+    })
+
+    Section:CreateProgressBar({
+        Name = "Progress",
+        Value = 45
+    })
+
+    Section:CreateLoadingIndicator({
+        Name = "Loading Indicator"
+    })
+
+    Section:CreateTooltip({
+        Name = "Tooltip",
+        Tooltip = "Helpful contextual information"
+    })
+
+    Section:CreateContextMenu({
+        Name = "Context Menu",
+        Options = {"Copy", "Reset"}
+    })
+
+    Section:CreateModal({
+        Name = "Modal",
+        Title = "Example Modal",
+        Content = "Modal content",
+        Callback = function()
+            print("[AETHER UI] Modal accepted")
+        end
+    })
+
+    Section:CreateConfigurationManager({
+        ConfigName = "Showcase"
+    })
+
+    Section:CreateThemeManager()
+
+    Window:Notify({
+        Title = "AETHER UI",
+        Content = "Full Showcase loaded successfully."
+    })
+end)
+
+if not ok then
+    warn("[AETHER UI] Showcase failed: " .. tostring(err))
+end
