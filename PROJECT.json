@@ -1,0 +1,13 @@
+{
+  "name": "AETHER UI",
+  "version": "1.0.0",
+  "runtime": [
+    "Roblox Luau",
+    "HTML5",
+    "CSS3",
+    "Vanilla JavaScript"
+  ],
+  "prototype_entry": "prototype/index.html",
+  "lua_entry": "src/init.lua",
+  "standalone": "build/AetherUI.lua"
+}
