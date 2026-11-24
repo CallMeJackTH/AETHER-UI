@@ -2,7 +2,22 @@
 -- Run as a LocalScript in Roblox Studio after installing the AETHER_UI ModuleScript.
 -- The page order and component layout follow prototype/index.html.
 
-local Aether = require(game.ReplicatedStorage.AETHER_UI)
+local function loadAether()
+    local module = game:GetService("ReplicatedStorage"):FindFirstChild("AETHER_UI")
+    if module then
+        return require(module)
+    end
+
+    -- Optional standalone fallback for executor-based preview environments.
+    local url = "https://raw.githubusercontent.com/CallMeJackTH/AETHER-UI/main/build/AetherUI.lua"
+    local source = game:HttpGet(url)
+    assert(type(source) == "string" and #source > 0, "[AETHER UI] Library source is empty.")
+    local chunk, compileError = loadstring(source)
+    assert(type(chunk) == "function", "[AETHER UI] Library compile failed: " .. tostring(compileError))
+    return chunk()
+end
+
+local Aether = loadAether()
 local Window = Aether:CreateWindow({
     Title = "Aether Framework",
     Subtitle = "Premium Interface Framework",
