@@ -270,7 +270,9 @@ function Aether:CreateWindow(config)
         floatingToggle.Text=compact and "A" or "Aether Toggle"
         floatingToggle.TextXAlignment=compact and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
         floatingToggle.TextSize=compact and 14 or 11
-        toggleDot.Visible=not compact
+        toggleDot.Visible=true
+        toggleDot.Size=compact and UDim2.fromOffset(5,5) or UDim2.fromOffset(8,8)
+        toggleDot.Position=compact and UDim2.fromOffset(25,6) or UDim2.fromOffset(10,12)
         togglePadding.PaddingLeft=UDim.new(0,compact and 0 or 25)
         floatingToggle:FindFirstChildOfClass("UICorner").CornerRadius=UDim.new(0,compact and 18 or 18)
         scale.Scale=compact and math.min(1,(viewport.X-24)/460,(viewport.Y-48)/320) or 1
