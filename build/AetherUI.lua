@@ -3,7 +3,7 @@ local __AETHER_MODULES = {}
 __AETHER_MODULES.Theme = (function()
 local Theme = {}
 Theme.Presets = {
-    Dark = {Background=Color3.fromRGB(9,10,13), Surface=Color3.fromRGB(16,18,22), Elevated=Color3.fromRGB(21,24,30), Border=Color3.fromRGB(37,42,51), Text=Color3.fromRGB(241,243,247), Muted=Color3.fromRGB(145,153,168), Accent=Color3.fromRGB(168,181,255)},
+    Dark = {Background=Color3.fromRGB(11,13,16), Surface=Color3.fromRGB(14,17,22), Elevated=Color3.fromRGB(19,23,30), Border=Color3.fromRGB(30,36,45), Text=Color3.fromRGB(230,234,240), Muted=Color3.fromRGB(142,153,172), Accent=Color3.fromRGB(94,139,255)},
     Midnight = {Background=Color3.fromRGB(6,8,17), Surface=Color3.fromRGB(12,16,31), Elevated=Color3.fromRGB(19,25,45), Border=Color3.fromRGB(39,49,77), Text=Color3.fromRGB(235,240,255), Muted=Color3.fromRGB(135,151,190), Accent=Color3.fromRGB(125,154,255)},
     Light = {Background=Color3.fromRGB(238,241,247), Surface=Color3.fromRGB(250,251,253), Elevated=Color3.fromRGB(231,235,243), Border=Color3.fromRGB(211,217,228), Text=Color3.fromRGB(28,32,42), Muted=Color3.fromRGB(103,112,129), Accent=Color3.fromRGB(79,102,210)}
 }
@@ -180,7 +180,7 @@ function Aether:CreateWindow(config)
     selfWindow.Gui=gui; selfWindow.Janitor:Add(gui)
     local toast=make("Frame",{Name="ToastLayer",BackgroundTransparency=1,Size=UDim2.fromScale(1,1),ZIndex=50},gui); selfWindow.ToastLayer=toast
     local theme=selfWindow.Theme
-    local main=make("Frame",{Name="MainWindow",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=config.Size or UDim2.fromOffset(600,440),BackgroundColor3=theme.Background,BackgroundTransparency=config.Acrylic==false and 0 or .08,ClipsDescendants=true},gui)
+    local main=make("Frame",{Name="MainWindow",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=config.Size or (UserInputService.TouchEnabled and UDim2.fromOffset(460,320) or UDim2.fromOffset(680,440)),BackgroundColor3=theme.Background,BackgroundTransparency=config.Acrylic==false and 0 or .10,ClipsDescendants=true},gui)
     selfWindow.Main=main; corner(main,12); stroke(main,theme.Border,.15)
     if config.Acrylic~=false then
         local gradient=make("UIGradient",{Rotation=35,Color=ColorSequence.new({ColorSequenceKeypoint.new(0,theme.Surface),ColorSequenceKeypoint.new(1,theme.Background)}),Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,.18),NumberSequenceKeypoint.new(1,.02)})},main)
@@ -190,7 +190,7 @@ function Aether:CreateWindow(config)
     local subtitle=text(titlebar,(config.Subtitle or "Premium Interface Framework").."  •  v"..selfWindow.Version,9,theme.Muted,false); subtitle.Position=UDim2.new(0,14,0,20); subtitle.Size=UDim2.new(1,-150,0,15)
     local min=button(titlebar,"—",theme,25); min.Size=UDim2.fromOffset(28,25); min.Position=UDim2.new(1,-68,0,7)
     local close=button(titlebar,"×",theme,25); close.Size=UDim2.fromOffset(28,25); close.Position=UDim2.new(1,-34,0,7)
-    min.MouseButton1Click:Connect(function() selfWindow.Minimized=not selfWindow.Minimized; tween(main,.2,{Size=selfWindow.Minimized and UDim2.new(main.Size.X.Scale,main.Size.X.Offset,0,40) or (config.Size or UDim2.fromOffset(600,440))}); selfWindow.Body.Visible=not selfWindow.Minimized end)
+    min.MouseButton1Click:Connect(function() selfWindow.Minimized=not selfWindow.Minimized; tween(main,.2,{Size=selfWindow.Minimized and UDim2.new(main.Size.X.Scale,main.Size.X.Offset,0,40) or (config.Size or (UserInputService.TouchEnabled and UDim2.fromOffset(460,320) or UDim2.fromOffset(680,440)))}); selfWindow.Body.Visible=not selfWindow.Minimized end)
     close.MouseButton1Click:Connect(function() selfWindow:Destroy() end)
     local dragging, dragStart, startPos=false,nil,nil
     selfWindow.Janitor:Add(titlebar.InputBegan:Connect(function(input)
