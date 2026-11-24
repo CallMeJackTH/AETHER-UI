@@ -355,11 +355,11 @@ function Aether:CreateWindow(config)
     end
     function selfWindow:ShowDialog(c)
         c=c or {}; local overlay=make("Frame",{Name="ModalBackdrop",BackgroundColor3=Color3.new(0,0,0),BackgroundTransparency=.42,Size=UDim2.fromScale(1,1),ZIndex=45},main)
-        local panel=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.fromOffset(300,150),BackgroundColor3=theme.Surface,ZIndex=31},overlay); corner(panel,10); stroke(panel,theme.Border,.1)
-        local t=text(panel,c.Title or "Confirm action",14,theme.Text,true); t.Position=UDim2.fromOffset(14,12); t.Size=UDim2.new(1,-28,0,24); t.ZIndex=32
-        local d=text(panel,c.Content or c.Description or "Are you sure you want to continue?",11,theme.Muted,false); d.Position=UDim2.fromOffset(14,42); d.Size=UDim2.new(1,-28,0,50); d.TextWrapped=true; d.ZIndex=32
-        local cancel=button(panel,c.CancelText or "Cancel",theme,30); cancel.Position=UDim2.new(0,14,1,-44); cancel.Size=UDim2.new(.5,-20,0,30); cancel.ZIndex=32
-        local confirm=button(panel,c.ConfirmText or "Confirm",theme,30); confirm.Position=UDim2.new(.5,6,1,-44); confirm.Size=UDim2.new(.5,-20,0,30); confirm.BackgroundColor3=theme.Accent; confirm.ZIndex=32
+        local panel=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.fromOffset(310,148),BackgroundColor3=Color3.fromRGB(17,21,29),ZIndex=46},overlay); corner(panel,10); stroke(panel,Color3.fromRGB(39,48,64),.05)
+        local t=text(panel,c.Title or "Confirm action",13,theme.Text,true); t.Position=UDim2.fromOffset(14,12); t.Size=UDim2.new(1,-28,0,24); t.ZIndex=47
+        local d=text(panel,c.Content or c.Description or "Are you sure you want to continue?",11,theme.Muted,false); d.Position=UDim2.fromOffset(14,42); d.Size=UDim2.new(1,-28,0,50); d.TextWrapped=true; d.ZIndex=47
+        local cancel=button(panel,c.CancelText or "Cancel",theme,28); cancel.Position=UDim2.new(0,14,1,-42); cancel.Size=UDim2.new(.5,-20,0,28); cancel.ZIndex=47
+        local confirm=button(panel,c.ConfirmText or "Confirm",theme,28); confirm.Position=UDim2.new(.5,6,1,-42); confirm.Size=UDim2.new(.5,-20,0,28); confirm.BackgroundColor3=theme.Accent; confirm.ZIndex=47
         cancel.MouseButton1Click:Connect(function() overlay:Destroy(); safeCallback(c.OnCancel) end)
         confirm.MouseButton1Click:Connect(function() overlay:Destroy(); safeCallback(c.Callback or c.OnConfirm) end)
         return overlay
