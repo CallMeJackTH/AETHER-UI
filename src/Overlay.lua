@@ -86,8 +86,8 @@ function Overlay:Clamp(position, size)
 	local viewport = self.ctx.Utils.GetViewport(self.Gui)
 	local margin = self.ctx.Theme.Layout.PopupMargin
 	return Vector2.new(
-		self.ctx.Utils.Clamp(position.X, margin, viewport.X - size.X - margin),
-		self.ctx.Utils.Clamp(position.Y, margin, viewport.Y - size.Y - margin)
+		math.floor(self.ctx.Utils.Clamp(position.X, margin, viewport.X - size.X - margin) + 0.5),
+		math.floor(self.ctx.Utils.Clamp(position.Y, margin, viewport.Y - size.Y - margin) + 0.5)
 	)
 end
 

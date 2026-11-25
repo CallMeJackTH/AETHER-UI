@@ -683,7 +683,7 @@ function Window:_buildFloating()
 	local diameter = ctx.Touch and layout.FloatingButtonTouch or layout.FloatingButton
 	local viewport = Utils.GetViewport(ctx.Gui)
 
-	self.FloatCenter = Vector2.new(diameter / 2 + 16, viewport.Y - diameter / 2 - 60)
+	self.FloatCenter = Vector2.new(diameter / 2 + 16, math.floor(viewport.Y - diameter / 2 - 60))
 
 	self.Floating = Utils.Create("CanvasGroup", {
 		Name = "Reopen",
@@ -731,8 +731,8 @@ function Window:_buildFloating()
 				local vp = Utils.GetViewport(ctx.Gui)
 				local half = diameter / 2
 				self.FloatCenter = Vector2.new(
-					Utils.Clamp(startCenter.X + delta.X, half, vp.X - half),
-					Utils.Clamp(startCenter.Y + delta.Y, half, vp.Y - half)
+					math.floor(Utils.Clamp(startCenter.X + delta.X, half, vp.X - half) + 0.5),
+					math.floor(Utils.Clamp(startCenter.Y + delta.Y, half, vp.Y - half) + 0.5)
 				)
 				ctx.Animation:Tween(self.Floating, { Position = UDim2.fromOffset(self.FloatCenter.X, self.FloatCenter.Y) }, 0)
 			end
@@ -797,8 +797,11 @@ function Window:_clampCenter(center)
 	)
 end
 
+-- Whole pixels only: with a centre anchor, a half-pixel offset makes the
+-- CanvasGroup resample (soft text), so size is kept even and the centre integral.
 function Window:_setCenter(center)
-	self.Center = self:_clampCenter(center)
+	local clamped = self:_clampCenter(center)
+	self.Center = Vector2.new(math.floor(clamped.X + 0.5), math.floor(clamped.Y + 0.5))
 	local position = UDim2.fromOffset(self.Center.X, self.Center.Y)
 	self.Parts.Position = position
 	self.ctx.Animation:Tween(self.Root, { Position = position }, 0)
@@ -817,6 +820,8 @@ function Window:_fit(initial)
 	local maxHeight = viewport.Y - margin * 2
 	local width = Utils.Clamp(self.RequestedSize.X, math.min(minimum.X, maxWidth), maxWidth)
 	local height = Utils.Clamp(self.RequestedSize.Y, math.min(minimum.Y, maxHeight), maxHeight)
+	width = math.max(2, math.floor(width / 2) * 2)
+	height = math.max(2, math.floor(height / 2) * 2)
 	self.Size = Vector2.new(width, height)
 
 	self.Root.Size = UDim2.fromOffset(width, height)
@@ -828,8 +833,8 @@ function Window:_fit(initial)
 	-- Keep the floating button on screen.
 	local half = (self.ctx.Touch and layout.FloatingButtonTouch or layout.FloatingButton) / 2
 	self.FloatCenter = Vector2.new(
-		Utils.Clamp(self.FloatCenter.X, half, viewport.X - half),
-		Utils.Clamp(self.FloatCenter.Y, half, viewport.Y - half)
+		math.floor(Utils.Clamp(self.FloatCenter.X, half, viewport.X - half) + 0.5),
+		math.floor(Utils.Clamp(self.FloatCenter.Y, half, viewport.Y - half) + 0.5)
 	)
 	self.Floating.Position = UDim2.fromOffset(self.FloatCenter.X, self.FloatCenter.Y)
 end
