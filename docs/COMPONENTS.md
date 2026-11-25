@@ -250,11 +250,14 @@ The window also has its own search field, which filters items on the active tab.
 ~~~lua
 local Progress = Section:CreateProgressBar({
     Name = "Loading",
-    Value = 0.25,
+    Min = 0,
+    Max = 100,
+    Default = 25,
+    Suffix = "%",
 })
 ~~~
 
-Use the returned component's Set(value) method to update progress. Values use a 0–1 fraction.
+Default is the initial value; Min and Max define the range (defaults 0 and 100). Suffix is optional display text. Use Set(value, silent), Get(), and SetIndeterminate(true/false) to update the progress bar.
 
 ## LoadingIndicator
 
