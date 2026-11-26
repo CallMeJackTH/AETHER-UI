@@ -174,5 +174,6 @@ def build() -> str:
 
 if __name__ == "__main__":
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(build(), encoding="utf-8", newline="\n")
+    with OUTPUT.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(build())
     print(f"Built {OUTPUT.relative_to(ROOT)}")
