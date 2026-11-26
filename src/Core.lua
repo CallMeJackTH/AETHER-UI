@@ -43,7 +43,7 @@ local ESP = require(script.Parent.ESP)
 
 local Core = {}
 Core.__index = Core
-Core.Version = "1.0.0"
+Core.Version = "1.1.0"
 
 local function envLookup(name)
 	local ok, value = pcall(function()
