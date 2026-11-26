@@ -64,6 +64,11 @@ Library:Notify({
 
 - [Getting Started](docs/GETTING_STARTED.md) — installation, window setup, tabs, sections, and a complete example.
 - [Components Reference](docs/COMPONENTS.md) — component options, callbacks, and shared methods.
+- [Player ESP](docs/ESP.md) — world-space player overlays, device icons, and controller API.
+
+## Optional systems
+
+- Player ESP — name, health, PC/mobile device icon, ping, streak, death counter, and ultimate bar. See [Player ESP docs](docs/ESP.md) and `examples/PlayerESP.lua`.
 
 ## Built-in components
 
