@@ -48,7 +48,7 @@ The controller is registered with its creating Library instance and is automatic
 | ShowDeathCounter | true | Character Counter object, when present |
 | ShowUltimate | true | Ultimate attribute and progress bar |
 
-Color options are also configurable: `BackgroundColor`, `BorderColor`, `TextColor`, `MutedColor`, `AccentColor`, `GreenColor`, and `RedColor`.
+Color options can be passed in the initial `Library:CreateESP({...})` options: `BackgroundColor`, `BorderColor`, `TextColor`, `MutedColor`, `AccentColor`, `GreenColor`, and `RedColor`.
 
 ## Device detection
 
