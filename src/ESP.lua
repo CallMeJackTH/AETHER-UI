@@ -271,6 +271,7 @@ function ESP:_makeEntry(player)
 
     local name = makeLabel(root, "PlayerName", UDim2.fromOffset(8, 4), UDim2.new(1, -38, 0, 17), self.Options.TextColor, 12, true)
     local deviceIcon = makeDeviceIcon(root, self.Options)
+    deviceIcon.Position = UDim2.new(1, -27, 0, 2)
 
     local healthTrack = create("Frame", {
         Name = "HealthTrack",
@@ -344,7 +345,8 @@ function ESP:_bindCharacter(player)
     local adornee = character:FindFirstChild("Head") or character:FindFirstChild("HumanoidRootPart")
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     if not adornee then
-        adornee = character:WaitForChild("Head", 3) or character:WaitForChild("HumanoidRootPart", 3)
+        entry.Billboard.Enabled = false
+        return
     end
 
     entry.Character = character
