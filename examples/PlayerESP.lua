@@ -51,12 +51,13 @@ local options = {
 }
 
 for _, option in ipairs(options) do
+    local optionKey = option.Key
     ESPSection:CreateToggle({
         Name = option.Name,
         Flag = option.Flag,
         Default = true,
         Callback = function(value)
-            ESP:SetOption(option.Key, value)
+            ESP:SetOption(optionKey, value)
         end,
     })
 end
