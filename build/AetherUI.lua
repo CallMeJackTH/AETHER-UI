@@ -3735,7 +3735,7 @@ local function buildComponents(window)
 	local tab = window:CreateTab({
 		Name = "Components",
 		Icon = "components",
-		Section = "LIBRARY",
+		Section = "",
 		Order = 2000,
 		Description = "Every control, with callbacks, Set() / Get() and disabled states.",
 	})
@@ -3823,7 +3823,7 @@ local function buildShowcase(window)
 	local tab = window:CreateTab({
 		Name = "Showcase",
 		Icon = "showcase",
-		Section = "LIBRARY",
+		Section = "",
 		Order = 2010,
 		Description = "Design tokens and composed examples.",
 	})
@@ -3938,7 +3938,7 @@ local function buildNotifications(window)
 	local tab = window:CreateTab({
 		Name = "Notifications",
 		Icon = "notifications",
-		Section = "LIBRARY",
+		Section = "",
 		Order = 2020,
 		Description = "Toasts stack bottom-right, even while the window is minimized.",
 	})
@@ -4019,7 +4019,7 @@ local function buildModals(window)
 	local tab = window:CreateTab({
 		Name = "Modals",
 		Icon = "modals",
-		Section = "LIBRARY",
+		Section = "",
 		Order = 2030,
 		Description = "Dialogs, modals, context menus and tooltips.",
 	})
