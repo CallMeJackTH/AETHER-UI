@@ -5,9 +5,9 @@ local function methods(obj, list, label)
 	for _, name in ipairs(list) do check(type(obj[name]) == "function", label .. ":" .. name .. " exists") end
 end
 
-methods(Library, { "CreateWindow", "GetWindows", "Notify", "Dialog", "Modal", "ContextMenu", "AttachTooltip", "SetTheme", "SetAccent", "Override", "GetTheme", "GetThemeNames", "SaveConfig", "LoadConfig", "DeleteConfig", "ListConfigs", "LoadAutoload", "Destroy" }, "Library")
+methods(Library, { "CreateWindow", "GetWindows", "CreateESP", "Notify", "Dialog", "Modal", "ContextMenu", "AttachTooltip", "SetTheme", "SetAccent", "Override", "GetTheme", "GetThemeNames", "SaveConfig", "LoadConfig", "DeleteConfig", "ListConfigs", "LoadAutoload", "Destroy" }, "Library")
 check(type(Library.new) == "function", "Library.new creates extra instances")
-check(Library.Version == "1.0.0", "Library.Version")
+check(Library.Version == "1.1.0", "Library.Version")
 
 local window = Library:CreateWindow({ Title = "API", Size = Vector2.new(650, 420), Pages = false })
 methods(window, { "CreateTab", "GetTab", "SelectTab", "Minimize", "Restore", "Toggle", "Close", "Destroy", "SetTitle", "SetStatus", "SetToggleKey", "SetSize", "SetTransparency", "SetBlur", "Search", "Notify", "IsVisible", "BringToFront" }, "Window")
