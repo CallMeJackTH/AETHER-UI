@@ -2738,7 +2738,7 @@ function ESP:_makeEntry(player)
     }
 
     local entry = self.Entries[player]
-    entry.CharacterConnection = self:_track(player.CharacterAdded:Connect(function()
+    entry.CharacterConnection = player.CharacterAdded:Connect(function()
         task.defer(function()
             self:_bindCharacter(player)
         end)
