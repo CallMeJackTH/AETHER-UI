@@ -314,6 +314,7 @@ function ESP:_makeEntry(player)
     self.Entries[player] = {
         Billboard = billboard,
         Scale = scale,
+        CharacterConnection = nil,
         Name = name,
         DeviceIcon = deviceIcon,
         HealthTrack = healthTrack,
@@ -326,6 +327,13 @@ function ESP:_makeEntry(player)
         Character = nil,
         Humanoid = nil,
     }
+
+    local entry = self.Entries[player]
+    entry.CharacterConnection = self:_track(player.CharacterAdded:Connect(function()
+        task.defer(function()
+            self:_bindCharacter(player)
+        end)
+    end))
 
     self:_bindCharacter(player)
 end
@@ -439,6 +447,10 @@ function ESP:_removeEntry(player)
         return
     end
     self.Entries[player] = nil
+    if entry.CharacterConnection then
+        entry.CharacterConnection:Disconnect()
+        entry.CharacterConnection = nil
+    end
     if entry.Billboard then
         entry.Billboard:Destroy()
     end
@@ -451,24 +463,11 @@ function ESP:_bindPlayers()
 
     self:_track(self.Players.PlayerAdded:Connect(function(player)
         self:_makeEntry(player)
-        self:_track(player.CharacterAdded:Connect(function()
-            task.defer(function()
-                self:_bindCharacter(player)
-            end)
-        end))
     end))
 
     self:_track(self.Players.PlayerRemoving:Connect(function(player)
         self:_removeEntry(player)
     end))
-
-    for player in pairs(self.Entries) do
-        self:_track(player.CharacterAdded:Connect(function()
-            task.defer(function()
-                self:_bindCharacter(player)
-            end)
-        end))
-    end
 
     self:_track(RunService.Heartbeat:Connect(function(dt)
         if self._destroyed then
