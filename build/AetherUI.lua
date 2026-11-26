@@ -5,7 +5,7 @@
 	    local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/<user>/<repo>/main/build/AetherUI.lua"))()
 	    local Window = Library:CreateWindow({ Title = "AETHER", Size = Vector2.new(650, 420) })
 
-	Modules: Animation, Components, ConfigManager, Core, Notifications, Overlay, Pages, Sidebar, Theme, Utils, Window, Components/Button, Components/ColorPicker, Components/Divider, Components/Dropdown, Components/Keybind, Components/Label, Components/MultiDropdown, Components/Paragraph, Components/Slider, Components/Textbox, Components/Toggle
+	Modules: Animation, Components, ConfigManager, Core, ESP, Notifications, Overlay, Pages, Sidebar, Theme, Utils, Window, Components/Button, Components/ColorPicker, Components/Divider, Components/Dropdown, Components/Keybind, Components/Label, Components/MultiDropdown, Components/Paragraph, Components/Slider, Components/Textbox, Components/Toggle
 ]]
 
 local __defs = {}
