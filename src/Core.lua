@@ -39,6 +39,7 @@ end
 local Components = siblingModule("Components")
 local Window = require(script.Parent.Window)
 local Pages = require(script.Parent.Pages)
+local ESP = require(script.Parent.ESP)
 
 local Core = {}
 Core.__index = Core
@@ -206,6 +207,15 @@ end
 
 function Core:GetWindows()
 	return table.clone(self.Windows)
+end
+
+-- Create a world-space ESP controller. The controller is owned by this
+-- Library instance and is automatically destroyed with it.
+function Core:CreateESP(options)
+	assert(not self._destroyed, "[AetherUI] this Library has been destroyed")
+	local controller = ESP.new(self.Ctx, options)
+	self.Maid:Give(controller)
+	return controller
 end
 
 ----------------------------------------------------------------------
