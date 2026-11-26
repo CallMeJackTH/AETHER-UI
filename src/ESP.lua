@@ -223,6 +223,8 @@ function ESP.new(ctx, options)
             self.Options[key] = value
         end
     end
+    self.Options.MaxDistance = math.max(0, tonumber(self.Options.MaxDistance) or DEFAULTS.MaxDistance)
+    self.Options.UpdateInterval = math.max(0.03, tonumber(self.Options.UpdateInterval) or DEFAULTS.UpdateInterval)
 
     self.Players = Players
     self.LocalPlayer = Players.LocalPlayer
@@ -497,11 +499,16 @@ end
 
 function ESP:SetOption(name, value)
     assert(DEFAULTS[name] ~= nil, "[AetherUI ESP] unknown option: " .. tostring(name))
+    if name == "MaxDistance" then
+        value = math.max(0, tonumber(value) or DEFAULTS.MaxDistance)
+    elseif name == "UpdateInterval" then
+        value = math.max(0.03, tonumber(value) or DEFAULTS.UpdateInterval)
+    end
     self.Options[name] = value
 
     if name == "MaxDistance" then
         for _, entry in pairs(self.Entries) do
-            entry.Billboard.MaxDistance = tonumber(value) or DEFAULTS.MaxDistance
+            entry.Billboard.MaxDistance = value
         end
     end
 
