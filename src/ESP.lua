@@ -333,7 +333,7 @@ function ESP:_makeEntry(player)
         task.defer(function()
             self:_bindCharacter(player)
         end)
-    end))
+    end)
 
     self:_bindCharacter(player)
 end
